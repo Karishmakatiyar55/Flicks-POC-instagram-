@@ -144,7 +144,8 @@ main{position:relative;z-index:1}
 .media{position:absolute;left:0;top:0;width:0;height:0;z-index:20;display:flex;align-items:center;overflow:hidden;background:radial-gradient(120% 70% at 50% 40%,color-mix(in srgb,var(--tint) 70%,#fff 8%) 0%,var(--tint) 55%,#000 120%);cursor:pointer}
 .media .mi{width:100%;pointer-events:none}
 .fmt[data-state="play"] .media,.fmt[data-state="iab"] .media{cursor:default}
-.fmt[data-state="play"] .media .mi,.fmt[data-state="iab"] .media .mi,.fmt[data-state="live"] .media .mi{pointer-events:auto}
+.fmt[data-state="play"] .media .mi,.fmt[data-state="iab"] .media .mi,.fmt[data-state="live"] .media .mi,.fmt[data-kind="market"]:is([data-state="detail"],[data-state="pick"],[data-state="send"]) .media .mi{pointer-events:auto}
+.fmt[data-kind="market"]:is([data-state="detail"],[data-state="pick"],[data-state="send"]) .media{cursor:default}
 .fmt[data-state="live"] .media{cursor:default}
 .media .mi.full{height:100%}
 .media iframe.cfr{display:block;border:0;background:#000}
@@ -536,6 +537,7 @@ main{position:relative;z-index:1}
 .mp-tile small{color:#65676B;font-size:12px}
 .mp-spon{cursor:pointer}
 .mp-spon .mp-ph{box-shadow:0 0 0 2px #0866FF}
+.fmt[data-kind="market"]:not([data-state="browse"]):not([data-state="open"]) .mp-badge{display:none}
 .mp-badge{position:absolute;left:6px;bottom:6px;z-index:21;display:flex;align-items:center;gap:4px;height:24px;padding:0 8px;border-radius:12px;background:rgba(0,0,0,.6);color:#fff;font-size:11px;font-weight:600;animation:pulse 2.2s infinite}
 .mp-badge i[data-ic]{width:11px;height:11px}
 .fmt[data-state="open"] .mp-spon{transform:scale(.96);transition:transform .2s}
@@ -552,7 +554,7 @@ main{position:relative;z-index:1}
 .mp-fl{position:relative;width:100%;aspect-ratio:4/5;background:#0a2a5c}
 #f10 .media{background:radial-gradient(90% 60% at 50% 45%,#2a5aa8 0%,#0a2a5c 55%,#05142e 100%)}
 #f10:is([data-state="browse"],[data-state="open"]) .mi.full iframe.cfr{width:100%;height:auto;aspect-ratio:9/16;max-height:none;flex:none}
-.mp-hint{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);z-index:21;display:flex;align-items:center;gap:6px;height:30px;padding:0 12px;border-radius:15px;background:rgba(0,0,0,.6);color:#fff;font-size:12.5px;font-weight:600;white-space:nowrap;pointer-events:none;transition:opacity .3s}
+.mp-hint{position:absolute;left:50%;top:10px;transform:translateX(-50%);z-index:21;display:flex;align-items:center;gap:6px;height:30px;padding:0 12px;border-radius:15px;background:rgba(0,0,0,.6);color:#fff;font-size:12.5px;font-weight:600;white-space:nowrap;pointer-events:none;transition:opacity .3s}
 .fmt.eng .mp-hint,.fmt[data-state="pick"] .mp-hint,.fmt[data-state="send"] .mp-hint{opacity:0}
 .mp-hint i[data-ic]{width:15px;height:15px}
 .mp-var{padding:12px 14px 4px;display:flex;flex-direction:column;gap:8px}
@@ -1100,7 +1102,12 @@ function place(s, r, clip) {
   m.clipPath = 'inset(' + (clip ? clip[0] : 0) + 'px 0px ' + (clip ? clip[1] : 0) + 'px 0px)';
 }
 function slotGeo(s) {
-  if (s.kind === 'market') s.slot = (s.state === 'browse' || s.state === 'open') ? s.el.querySelector('[data-slot-tile]') : s.el.querySelector('[data-slot-detail]');
+  if (s.kind === 'market') {
+    // grid tile while browsing (trimmed to the grid's scroll area); listing photo after that (trimmed to the listing)
+    const home = s.state === 'browse' || s.state === 'open';
+    s.slot = s.el.querySelector(home ? '[data-slot-tile]' : '[data-slot-detail]');
+    s.clipEl = s.el.querySelector(home ? '.mp-home' : '[data-mp-scroll]');
+  }
   const r = rel(s, s.slot);
   let clip = null;
   if (s.clipEl) {
