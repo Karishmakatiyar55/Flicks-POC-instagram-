@@ -783,8 +783,7 @@ html.room::-webkit-scrollbar,html.room body::-webkit-scrollbar{display:none}
     </div>
     <div class="media" data-media style="--tint:#0d1f17"><div class="mi">
       <div class="ad0">
-      <script src="https://flicks.flamapp.live/ocbyu3/embed.js" async></script>
-      <flam-embed id="ocbyu3" style="aspect-ratio:1080/1920;width:100%"></flam-embed>
+      <div class="flick-lazy" data-fid="ocbyu3" data-ar="1080/1920"></div>
       </div>
       <div class="ad1"><div class="flick-lazy" data-fid="ikutv6" data-ar="1080/1920"></div></div>
     </div><span class="tap"><i data-ic="play"></i>Tap to try</span></div>
@@ -920,6 +919,7 @@ html.room::-webkit-scrollbar,html.room body::-webkit-scrollbar{display:none}
 &lt;head&gt;&lt;base href=&quot;https://flamdesign.github.io/FlicksLibrary/preview/blank-cheque-s1e03-bd4186/&quot;&gt;&lt;script&gt;
 /* MicroDrama in the POC: starts by itself, muted; the first tap turns the sound on (and does not pause the episode) */
 (function(){
+window.__flamGuard=1;
 var ctxs=[],ours=false,user=false;
 /* the episode must not pull focus into itself: the page reads focus inside a Flick as the viewer&#x27;s tap */
 var F=HTMLElement.prototype.focus;HTMLElement.prototype.focus=function(){if(user)return F.apply(this,arguments)};
@@ -929,9 +929,9 @@ var C=window.AudioContext||window.webkitAudioContext;if(C){var W=function(o){var
 function go(){var c=document.getElementById(&#x27;cover&#x27;),b=document.querySelector(&#x27;#cvBtns button&#x27;),m=document.getElementById(&#x27;bMute&#x27;);
 if(!c||!b||c.hidden)return;if(m&amp;&amp;!ours){m.click();ours=true}b.click()}
 addEventListener(&#x27;DOMContentLoaded&#x27;,function(){setTimeout(go,60)});
-function wake(e){if(!ours)return;ours=false;var m=document.getElementById(&#x27;bMute&#x27;);m&amp;&amp;m.click();ctxs.forEach(function(c){try{c.resume()}catch(x){}});
+function wake(e){try{parent.postMessage({type:&#x27;flick-tap&#x27;},&#x27;*&#x27;)}catch(x){}if(!ours)return;ours=false;var m=document.getElementById(&#x27;bMute&#x27;);m&amp;&amp;m.click();ctxs.forEach(function(c){try{c.resume()}catch(x){}});
 if(e.target&amp;&amp;e.target.closest&amp;&amp;e.target.closest(&#x27;#tap&#x27;)){var stop=function(ev){ev.stopPropagation();ev.preventDefault();removeEventListener(&#x27;click&#x27;,stop,true)};addEventListener(&#x27;click&#x27;,stop,true);setTimeout(function(){removeEventListener(&#x27;click&#x27;,stop,true)},800)}}
-addEventListener(&#x27;pointerdown&#x27;,wake,true);
+addEventListener(&#x27;pointerup&#x27;,wake,true);addEventListener(&#x27;touchend&#x27;,wake,true);
 var y=null,x=0,t=0;
 addEventListener(&#x27;touchstart&#x27;,function(e){var p=e.touches[0];y=p.clientY;x=p.clientX;t=Date.now()},{passive:true,capture:true});
 addEventListener(&#x27;touchend&#x27;,function(e){if(y==null)return;var p=e.changedTouches[0],dy=y-p.clientY,dx=x-p.clientX;y=null;
@@ -1809,33 +1809,29 @@ const MT = [
 const mh = document.querySelector('.mhead'), mprog = mh.querySelector('[data-mprog]');
 mprog.innerHTML = secs.map(() => '<span></span>').join('');
 let mIdx = 0;
-// A Flick builds its variant thumbnails for the space it has when it loads. Loaded while hidden, off-screen or
-// still sliding in, the thumbnails come out half drawn. So each Flick is created only once it is fully on screen
-// and has stopped moving, and removed again when its format or sheet is left.
-function lazyVisible(ph, s) {
-  const m = ph.closest('.media'), sc = s.el.querySelector('.screen');
-  if (!m || !sc) return null;
-  for (let a = ph.parentElement; a && a !== s.el; a = a.parentElement) { const cs = getComputedStyle(a); if (cs.display === 'none' || cs.visibility === 'hidden') return null; }
-  const r = m.getBoundingClientRect(), q = sc.getBoundingClientRect();
-  if (r.width < 60 || r.height < 60) return null;
-  const vis = Math.max(0, Math.min(r.right, q.right) - Math.max(r.left, q.left)) * Math.max(0, Math.min(r.bottom, q.bottom) - Math.max(r.top, q.top));
-  if (vis < r.width * r.height * .97) return null;
-  return [r.left, r.top, r.width, r.height].map(Math.round).join(',');
-}
-function unmountLazy(s) { s.el.querySelectorAll('.flick-lazy').forEach(ph => { ph._geo = null; ph.querySelectorAll('flam-embed').forEach(e => e.remove()); }); }
+// Flicks load as plain frames, exactly as the WhatsApp POC loads them (same address, same permissions).
+// Each one starts loading as soon as its format is on screen, so its variant pictures are ready before the
+// viewer opens it; a Flick hidden with display:none (the story's second ad) loads when it is shown, so it
+// never starts at zero size. Leaving the format removes it.
+const FLICK_PAGE = (() => { try { return /^https?:/.test(location.protocol) ? (location.origin + location.pathname).slice(0, 2048) : 'https://flamapp.com/'; } catch (e) { return 'https://flamapp.com/'; } })();
+const FLICK_SRC = id => 'https://flicks.flamapp.live/' + encodeURIComponent(id) + '/?embed=1&u=' + encodeURIComponent(FLICK_PAGE);
+function lazyShown(ph, s) { for (let a = ph.parentElement; a && a !== s.el; a = a.parentElement) if (getComputedStyle(a).display === 'none') return false; return true; }
+function unmountLazy(s) { s.el.querySelectorAll('.flick-lazy flam-embed').forEach(e => { const f = e.querySelector('iframe'); try { if (f) f.src = 'about:blank'; } catch (x) {} e.remove(); }); }
 setInterval(() => { const s = secs[mIdx]; if (s) mountLazy(s); }, 150);
 function mountLazy(s) {
   s.el.querySelectorAll('.flick-lazy').forEach(ph => {
     const id = ph.dataset.fid;
-    if (ph.querySelector('flam-embed#' + id)) return;
-    const g = lazyVisible(ph, s); if (!g) { ph._geo = null; return; }
-    if (ph._geo !== g) { ph._geo = g; return; }   // same place twice in a row: it has finished moving
-    document.querySelectorAll('flam-embed#' + id).forEach(el => el.remove());   // only one live copy per Flick
-    const fe = document.createElement('flam-embed'); fe.id = id; fe.style.cssText = 'aspect-ratio:' + ph.dataset.ar + ';width:100%';
-    ph.appendChild(fe);
-    if (!(window.customElements && customElements.get('flam-embed'))) {
-      const sc = document.createElement('script'); sc.async = true; sc.src = 'https://flicks.flamapp.live/' + id + '/embed.js'; document.body.appendChild(sc);
-    }
+    const on = ph.querySelector('flam-embed'), shown = lazyShown(ph, s);
+    if (on && !shown) { const f = on.querySelector('iframe'); try { if (f) f.src = 'about:blank'; } catch (x) {} on.remove(); return; }   // hidden again (story moved to its next ad): unload, so nothing plays unseen
+    if (on || !shown) return;
+    document.querySelectorAll('.flick-lazy flam-embed[data-fid="' + id + '"]').forEach(el => el.remove());   // one live copy per Flick
+    const fe = document.createElement('flam-embed'); fe.dataset.fid = id; fe.style.cssText = 'aspect-ratio:' + ph.dataset.ar + ';width:100%';
+    const f = document.createElement('iframe');
+    f.setAttribute('allow', 'autoplay; fullscreen; encrypted-media; picture-in-picture'); f.setAttribute('allowfullscreen', ''); f.setAttribute('scrolling', 'no');
+    f.title = 'Flam Flicks'; f.dataset.autoplay = '1'; f.dataset.flick = id;
+    f.style.cssText = 'display:block;width:100%;height:100%;border:0;background:transparent';
+    f.src = FLICK_SRC(id);
+    fe.appendChild(f); ph.appendChild(fe);
   });
 }
 function mShow(i) {
@@ -2013,6 +2009,10 @@ function collect(root, out, frames) {
   root.querySelectorAll('*').forEach(n => { if (n.shadowRoot) collect(n.shadowRoot, out, frames); });
 }
 function parts(s) { const m = [], f = []; collect(s.media, m, f); return [m, f]; }
+// frames with their own audio guard (the ad tags, the MicroDrama) keep themselves silent until a tap inside them;
+// the page must not mute or unmute their media on its own, or a phone drops the sound the tap just turned on
+const COARSE = !!(window.matchMedia && matchMedia('(pointer: coarse)').matches);
+function guarded(m) { try { return !!m.ownerDocument.defaultView.__flamGuard; } catch (e) { return false; } }
 function stripAutoplay(f) {
   // no autoplay delegation: the frame can only make sound after a tap inside it
   if (f._fx || f.dataset.autoplay) return; f._fx = true;   // MicroDrama keeps autoplay: it starts on arrival and is unloaded on leave
@@ -2030,7 +2030,7 @@ function reloadFrame(f) {
 }
 function applyAudio(s, on) {
   const [media, frames] = parts(s);
-  media.forEach(m => { if (m.muted === on) m.muted = !on; });
+  media.forEach(m => { if (on && guarded(m)) return; if (m.muted === on) m.muted = !on; });
   frames.forEach(f => { try { f.contentWindow.postMessage({ type: on ? 'unmute' : 'mute', muted: !on }, '*'); } catch (e) {} });
 }
 function engage(s) {
@@ -2043,7 +2043,6 @@ function disengage(s, hard) {
   // leaving a Flick (close, back, scroll or swipe away): mute, then reload its frames so no sound can carry on
   const was = s.engaged;
   s.engaged = false; s.el.classList.remove('eng');
-  if (was || hard) unmountLazy(s);   // created again, fresh, the next time it is on screen
   applyAudio(s, false);
   if (was || hard) {
     const [, frames] = parts(s);
@@ -2054,9 +2053,11 @@ function disengage(s, hard) {
 }
 // a tap inside a cross-origin frame moves focus into it: that is the "tapped the ad" signal
 setInterval(() => {
-  secs.forEach(s => { if (s !== current) park(s, false); const [m, f] = parts(s); f.forEach(stripAutoplay); if (!s.engaged) m.forEach(x => { if (!x.muted) x.muted = true; }); });
+  secs.forEach(s => { if (s !== current) park(s, false); const [m, f] = parts(s); f.forEach(stripAutoplay); if (!s.engaged) m.forEach(x => { if (!x.muted && !guarded(x)) x.muted = true; }); });
   const a = document.activeElement;
   if (a && a !== document.body) { const s = secs.find(x => x.media.contains(a)); if (s && s.active && LIVE[s.state]) engage(s); }
+  // phones do not always move focus into a Flick when it is tapped; the page losing focus while a Flick is open is the same signal
+  else if (COARSE && !document.hidden && !document.hasFocus() && current && current.active && LIVE[current.state]) engage(current);
 }, 250);
 addEventListener('blur', () => setTimeout(() => {
   const a = document.activeElement; const s = a && secs.find(x => x.media.contains(a));
@@ -2067,6 +2068,11 @@ addEventListener('pagehide', () => secs.forEach(s => disengage(s, true)));
 // if a Flick reports which variant was chosen, carry it into the Messenger reply
 addEventListener('message', e => {
   const d = e.data; if (!d || typeof d !== 'object') return;
+  if (d.type === 'flick-tap') {   // a tap inside a same-page frame (ad tag, MicroDrama)
+    const s = secs.find(x => [...x.media.querySelectorAll('iframe')].some(f => f.contentWindow === e.source));
+    if (s && s.active && LIVE[s.state]) engage(s);
+    return;
+  }
   if (d.type === 'flick-variant') {
     const m = secs.find(x => x.kind === 'market'); if (!m || !['detail', 'pick'].includes(m.state)) return;
     const o = d.detail || {};
