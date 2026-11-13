@@ -1,15 +1,14 @@
 # Flicks on Instagram · POC
 
-Interactive proof of concept by Flam: Flicks (swappable, interactive videos) on Instagram. One phone, six formats:
+Interactive proof of concept by Flam: Flicks (swappable, interactive videos) on Instagram. One phone, five formats:
 
-1. **Stories playable ad** (Gucci)
-2. **Creator reel → link in bio** (Necklace Swap)
-3. **Story link sticker**, "Which fit tonight?" (Gap)
-4. **Partnership ad, Shop now** (Nike)
-5. **Content Flick: Get Ready With Me reel**
-6. **Content Flick: MicroDrama between reels**, with an ad label and install button
+1. **Instagram Stories**: two story ads that are Flicks (Gucci, then Necklace Swap)
+2. **Partnership ad, Shop now** (Nike)
+3. **Content Flick: Get Ready With Me reel**
+4. **Content Flick: MicroDrama between reels**
+5. **Creator profile → link in bio** (Necklace Swap)
 
-On a laptop, pick a format from the list, or use the arrow keys or the scroll wheel. On a phone, each format is full screen; move between them with ‹ ›.
+On a laptop, pick a format from the list, or use the arrow keys or the scroll wheel. On a phone, each format is full screen; swipe up or down to move between them.
 
 ## Hosting on Vercel
 Import this repository in Vercel (Add New → Project), framework preset **Other**, no build command, root directory unchanged. Every push to `main` redeploys.
