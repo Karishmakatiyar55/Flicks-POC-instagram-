@@ -859,9 +859,33 @@ html.room::-webkit-scrollbar,html.room body::-webkit-scrollbar{display:none}
         <div class="lp-stage"><div class="lp-slot" data-slot></div></div>
       </div>
     </div>
-    <div class="media" data-media style="--tint:#141414"><div class="mi">
-      <div class="flick-lazy" data-fid="ebxe0f" data-ar="1080/1080"></div>
-    </div></div>
+    <div class="media" data-media style="--tint:#000;background:#000"><div class="mi full fill"><iframe class="cfr" title="Nike ad" allow="fullscreen" allowtransparency="true" style="border:0;display:block;background:transparent" srcdoc="&lt;!doctype html&gt;
+&lt;meta charset=utf-8&gt;
+&lt;meta name=ad.orientation content=portrait,landscape&gt;
+&lt;meta name=color-scheme content=dark&gt;
+&lt;style&gt;html,body{margin:0;height:100%;background:transparent;overflow:hidden;color-scheme:dark}&lt;/style&gt;
+&lt;script&gt;
+/* audio guard: silent until the page says the viewer tapped in; never overrides the Flick&#x27;s own speaker button */
+(function(){window.__flamGuard=1;var on=false,ctxs=[],AC=window.AudioContext||window.webkitAudioContext;
+if(AC){var W=function(a){var c=a?new AC(a):new AC();ctxs.push(c);return c};W.prototype=AC.prototype;window.AudioContext=window.webkitAudioContext=W;}
+var P=HTMLMediaElement.prototype,play=P.play;P.play=function(){if(!on&amp;&amp;!this.muted){this.muted=true;this._g=1}return play.apply(this,arguments)};
+function apply(){document.querySelectorAll(&#x27;video,audio&#x27;).forEach(function(m){if(!on){if(!m.muted){m.muted=true;m._g=1}}else if(m._g){m._g=0;m.muted=false}});
+ctxs.forEach(function(c){try{if(!on){if(c.state===&#x27;running&#x27;){c._g=1;c.suspend()}}else if(c._g){c._g=0;c.resume()}}catch(e){}})}
+setInterval(apply,200);
+addEventListener(&#x27;message&#x27;,function(e){var d=e.data;/* sound comes on only from a tap inside this frame, never from a message */if(d&amp;&amp;d.type===&#x27;mute&#x27;){on=false;apply()}}); function tap(){if(!on){on=true;apply()}try{parent.postMessage({type:&#x27;flick-tap&#x27;},&#x27;*&#x27;)}catch(x){}} [&#x27;touchend&#x27;,&#x27;pointerup&#x27;,&#x27;click&#x27;].forEach(function(n){addEventListener(n,tap,true)});
+})();
+&lt;/script&gt;
+&lt;script&gt;
+/* report vertical swipes and scroll-wheel to the page, so the viewer can move to the next format from on top of the Flick */
+(function(){var y=null,x=0,t=0;
+addEventListener(&#x27;touchstart&#x27;,function(e){var p=e.touches[0];y=p.clientY;x=p.clientX;t=Date.now()},{passive:true,capture:true});
+addEventListener(&#x27;touchend&#x27;,function(e){if(y==null)return;var p=e.changedTouches[0],dy=y-p.clientY,dx=x-p.clientX;y=null;
+if(Date.now()-t&lt;900&amp;&amp;Math.abs(dy)&gt;=60&amp;&amp;Math.abs(dy)&gt;=Math.abs(dx)*1.3)parent.postMessage({type:&#x27;flick-gesture&#x27;,swipe:dy},&#x27;*&#x27;)},{passive:true,capture:true});
+addEventListener(&#x27;wheel&#x27;,function(e){parent.postMessage({type:&#x27;flick-gesture&#x27;,wheel:e.deltaY},&#x27;*&#x27;)},{passive:true,capture:true});})();
+&lt;/script&gt;
+
+&lt;script&gt;var ExitApi=window.ExitApi||{exit:function(){}},clickTag=&quot;${CLICK_URL_UNESC}&quot;;&lt;/script&gt;
+&lt;script src=https://native-ads-dev.appless.workers.dev/6a97885c9e74536944d35d53_dsefds/ad.js&gt;&lt;/script&gt;"></iframe></div></div>
     <div class="island"></div>
    </div>
   </div></div></div>
@@ -2059,7 +2083,7 @@ function disengage(s, hard) {
 }
 // a tap inside a cross-origin frame moves focus into it: that is the "tapped the ad" signal
 setInterval(() => {
-  secs.forEach(s => { if (s !== current) park(s, false); const [m, f] = parts(s); f.forEach(stripAutoplay); if (!s.engaged) m.forEach(x => { if (!x.muted && !guarded(x)) x.muted = true; }); });
+  secs.forEach(s => { if (s !== current) park(s, false); else if (s.kind === 'partner') park(s, s.state === 'iab'); const [m, f] = parts(s); f.forEach(stripAutoplay); if (!s.engaged) m.forEach(x => { if (!x.muted && !guarded(x)) x.muted = true; }); });
   const a = document.activeElement;
   if (a && a !== document.body) { const s = secs.find(x => x.media.contains(a)); if (s && s.active && LIVE[s.state]) engage(s); }
   // phones do not always move focus into a Flick when it is tapped; the page losing focus while a Flick is open is the same signal
