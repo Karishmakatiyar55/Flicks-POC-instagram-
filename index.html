@@ -614,6 +614,22 @@ main{position:relative;z-index:1}
 
 #f2[data-ad="1"] .ad0,#f2:not([data-ad="1"]) .ad1{display:none}
 #f2[data-ad="1"] .media{--tint:#2a1620 !important}
+
+/* tap cues: soft double halo on the next thing to tap, no text */
+@keyframes cue{0%{box-shadow:0 0 0 0 rgb(var(--c) / .55),0 0 0 0 rgb(var(--c) / .28)}55%{box-shadow:0 0 0 7px rgb(var(--c) / 0),0 0 0 15px rgb(var(--c) / .06)}100%{box-shadow:0 0 0 0 rgb(var(--c) / 0),0 0 0 0 rgb(var(--c) / 0)}}
+@keyframes sheen{0%{background-position:160% 0}55%,100%{background-position:-60% 0}}
+.tap{--c:255 255 255;animation:cue 2.2s cubic-bezier(.2,.7,.2,1) infinite!important}
+.fmt[data-kind="feed"]:is([data-state="scroll"],[data-state="leadin"]) .fb-cta button{--c:8 102 255;background:#E7F0FF;color:#0866FF;animation:cue 2.2s cubic-bezier(.2,.7,.2,1) infinite}
+.fmt[data-state="profile"] .biolink{--c:180 214 255;background:rgba(224,241,255,.08);animation:cue 2.2s cubic-bezier(.2,.7,.2,1) infinite!important}
+.fmt[data-kind="partner"]:is([data-state="browse"],[data-state="scroll"]) .ig-cta{background-image:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.38) 50%,transparent 65%);background-size:220% 100%;background-repeat:no-repeat;animation:sheen 2.6s ease-in-out infinite}
+.fmt[data-kind="chat"].arrived[data-state="msg"] .lcard{--c:8 102 255;animation:cue 2.2s cubic-bezier(.2,.7,.2,1) infinite}
+.lp-foot button.lp-btn{--c:8 102 255;animation:cue 2.2s cubic-bezier(.2,.7,.2,1) infinite!important}
+.sheet button{--c:26 26 26;animation:cue 2.2s cubic-bezier(.2,.7,.2,1) infinite!important}
+.fmt[data-kind="market"]:is([data-state="detail"],[data-state="pick"]) .mp-send,.fmt[data-kind="market"]:is([data-state="detail"],[data-state="pick"]) .mp-acts .pri,.fmt[data-kind="market"][data-state="reply"] .mp-qr span:first-child{--c:8 102 255;animation:cue 2.2s cubic-bezier(.2,.7,.2,1) infinite!important}
+.mp-badge{--c:255 255 255;animation:cue 2.2s cubic-bezier(.2,.7,.2,1) infinite!important}
+.fmt[data-kind="market"][data-state="browse"] .mp-spon .mp-ph{animation:none}
+.pc-close:has(i[data-ic]){--c:255 255 255;animation:cue 2.6s cubic-bezier(.2,.7,.2,1) infinite}
+
 /* closing */
 .closing{max-width:1240px;margin:0 auto;padding:120px 32px 60px;display:flex;flex-direction:column;gap:28px}
 .closing h2{margin:0;font-size:clamp(40px,5.4vw,80px);line-height:.98;letter-spacing:-.04em;font-weight:600;text-wrap:balance}
@@ -742,113 +758,12 @@ main{position:relative;z-index:1}
  </div>
 </section>
 
-
-
-
-<!-- ═════════ 04 CREATOR REEL → LINK IN BIO ═════════ -->
-<section class="fmt lk-sec" id="f4" data-kind="creator" data-name="02 · Creator reel → link in bio" data-state="reel">
- <div class="fmt-in">
-  <div class="copy">
-    <nav class="fmtlist" aria-label="Formats"></nav>
-    <div class="eyebrow"><b>02</b><span class="rule"></span><span>Link · Creator reel</span></div>
-    <h2>One on camera. <span class="serif">Two more behind the link.</span></h2>
-    <p class="one">Link in bio opens the Flick inside Instagram.</p>
-    <div class="tags"><span class="tag ">Necklace Swap</span><span class="tag ">Creator or affiliate</span></div>
-    <ol class="steps"><li data-at="reel">Reel</li><li data-at="profile">Bio link</li><li data-at="iab">Try on</li></ol>
-    <button class="replay" data-replay><i data-ic="replay"></i>Replay</button>
-  </div>
-  <div class="stage"><div class="phone"><div class="sw">
-   <div class="screen reels" data-screen>
-    <div class="sb lt"><span>9:41</span><span class="ind"><span class="bars4"><span style="height:4px"></span><span style="height:6px"></span><span style="height:8px"></span><span style="height:11px"></span></span><span class="bat"></span></span></div>
-    <div class="reel-bg" data-img="ria" style="background:#2a0f1b"><span class="im-shade"></span></div>
-    <div class="r-head"><span>Reels</span><i data-ic="camera"></i></div>
-    <div class="r-side"><span><i data-ic="heart"></i>48.2K</span><span><i data-ic="comment"></i>612</span><span><i data-ic="send"></i>2.1K</span><span><i data-ic="more"></i></span></div>
-    <div class="r-cap">
-      <div class="who" data-toprofile style="cursor:pointer"><span class="av" style="background:#7a3048">R</span>ria.wears<em>Follow</em></div>
-      <div>Tried 1 of the 3 pieces from the new drop. Want to see how the other 2 look on me? <mark>Link in bio</mark></div>
-      <div class="mus"><i data-ic="music"></i>Original audio · ria.wears</div>
-    </div>
-    <nav class="tabbar ig-tabs"><i data-ic="home"></i><i data-ic="search"></i><i data-ic="plusbox"></i><i data-ic="reels"></i><span class="me"></span></nav>
-    <div class="prof">
-      <div class="spacer"></div>
-      <div class="prof-bar"><i data-ic="back"></i><span>ria.wears</span><span class="sp"></span><i data-ic="bell"></i><i data-ic="more"></i></div>
-      <div class="prof-top"><span class="ring"><div data-img="ria" style="background:#2a0f1b"></div></span><span class="stats"><span><b>412</b>posts</span><span><b>86.4K</b>followers</span><span><b>310</b>following</span></span></div>
-      <div class="bio"><b>Ria Kapoor</b><span class="cat">Fashion stylist</span><span>Jewellery and everyday styling · Mumbai</span><span>New drop: try every piece on me</span>
-        <button class="biolink press" data-link><i data-ic="link"></i>flicks.flamapp.ai/ria-necklaces</button></div>
-      <div class="prof-btns"><span>Follow</span><span>Message</span></div>
-      <div class="hls"><span><b data-img="earrings"></b>New drop</span><span><b data-img="ria"></b>Try-ons</span><span><b data-img="goa"></b>Travel</span><span><b data-img="mirror"></b>GRWM</span></div>
-      <div class="pgrid">
-        <span data-img="ria"></span><span data-img="earrings"></span><span data-img="mirror"></span>
-        <span data-img="cafe"></span><span data-img="marine"></span><span data-img="goa"></span>
-      </div>
-    </div>
-    <div class="iab">
-      <div class="iab-bar"><button data-iabclose aria-label="Close browser"><i data-ic="x"></i></button><span class="iab-t"><b>Necklace Swap</b><small><i data-ic="lock"></i>flicks.flamapp.ai</small></span><i data-ic="more"></i></div>
-      <div class="iab-page" style="--lp:#1c0f15">
-        <div class="lp-head"><span>Necklace Swap</span><span>× ria.wears</span></div>
-        <div class="lp-stage"><div class="lp-slot tall" data-slot></div></div>
-      </div>
-    </div>
-    <div class="media" data-media style="--tint:#2a1620"><div class="mi">
-      <div class="flick-lazy" data-fid="ikutv6" data-ar="1080/1920"></div>
-    </div></div>
-    <div class="island"></div>
-   </div>
-  </div></div></div>
- </div>
-</section>
-
-<!-- ═════════ 05 STORY LINK STICKER ═════════ -->
-<section class="fmt lk-sec" id="f5" data-kind="sticker" data-name="03 · Story link sticker" data-state="story">
- <div class="fmt-in">
-  <div class="copy">
-    <nav class="fmtlist" aria-label="Formats"></nav>
-    <div class="eyebrow"><b>03</b><span class="rule"></span><span>Link · Story sticker</span></div>
-    <h2>"Which fit tonight?" <span class="serif">Swap them on me.</span></h2>
-    <p class="one">A link sticker opens the Gap Flick in-app.</p>
-    <div class="tags"><span class="tag ">Gap</span><span class="tag ">Organic or boosted</span></div>
-    <ol class="steps"><li data-at="story">Story</li><li data-at="tap">Sticker</li><li data-at="iab">Try fits</li></ol>
-    <button class="replay" data-replay><i data-ic="replay"></i>Replay</button>
-  </div>
-  <div class="stage"><div class="phone"><div class="sw">
-   <div class="screen story" data-screen>
-    <div class="sb lt"><span>9:41</span><span class="ind"><span class="bars4"><span style="height:4px"></span><span style="height:6px"></span><span style="height:8px"></span><span style="height:11px"></span></span><span class="bat"></span></span></div>
-    <div class="stw">
-      <div class="cs-photo" data-img="kabir"></div>
-      <div class="cs-text"><span>Can't decide on tonight's fit.</span><br><span>Swap them on me and tell me which one</span></div>
-      <button class="sticker" data-link style="top:58%"><i data-ic="link"></i>Try the fits on me</button>
-      <div class="st-reply"><span class="in">Send message</span><i data-ic="heart"></i><i data-ic="send"></i></div>
-    </div>
-    <div class="st-top">
-      <div class="bars"><span><i data-bar></i></span></div>
-      <div class="st-row always"><span class="av" style="background:#6a5acd">K</span><b>kabir.fits</b><span>38m</span><span class="x"><i data-ic="more"></i><i data-ic="x"></i></span></div>
-    </div>
-    <div class="iab dark">
-      <div class="iab-bar"><button data-iabclose aria-label="Close browser"><i data-ic="x"></i></button><span class="iab-t"><b>Gap</b><small><i data-ic="lock"></i>native-ads.appless.workers.dev</small></span><i data-ic="more"></i></div>
-      <div class="iab-page" style="--lp:#000"><div data-slot style="flex:1;min-height:0"></div></div>
-    </div>
-    <div class="media" data-media style="--tint:#000;background:#000"><div class="mi full fill">
-      <iframe
-        src="https://native-ads.appless.workers.dev/6a9eb4cd93e71f3ec92010f1_im75ys"
-        allow="fullscreen; camera; microphone"
-        allowFullScreen
-        title="Gap"
-        class="cfr"
-        style="border:0;display:block;background:#000">
-      </iframe>
-    </div></div>
-    <div class="island"></div>
-   </div>
-  </div></div></div>
- </div>
-</section>
-
 <!-- ═════════ 06 PARTNERSHIP AD ═════════ -->
-<section class="fmt lk-sec" id="f6" data-kind="partner" data-name="04 · Partnership ad, Shop now" data-state="browse">
+<section class="fmt lk-sec" id="f6" data-kind="partner" data-name="02 · Partnership ad, Shop now" data-state="browse">
  <div class="fmt-in">
   <div class="copy">
     <nav class="fmtlist" aria-label="Formats"></nav>
-    <div class="eyebrow"><b>04</b><span class="rule"></span><span>Link · Partnership ad</span></div>
+    <div class="eyebrow"><b>02</b><span class="rule"></span><span>Link · Partnership ad</span></div>
     <h2>Creator's post, <span class="serif">brand's Flick.</span></h2>
     <p class="one">Shop now lands on the Flick, not a product page.</p>
     <div class="tags"><span class="tag ">Nike</span><span class="tag ">Pays per click</span></div>
@@ -904,18 +819,12 @@ main{position:relative;z-index:1}
  </div>
 </section>
 
-
-
-
-
-
-
 <!-- ═════════ 08 GET READY WITH ME REEL ═════════ -->
-<section class="fmt cf-sec" id="f8" data-kind="reelflick" data-name="05 · Get Ready With Me reel" data-state="r1">
+<section class="fmt cf-sec" id="f8" data-kind="reelflick" data-name="03 · Get Ready With Me reel" data-state="r1">
  <div class="fmt-in">
   <div class="copy">
     <nav class="fmtlist" aria-label="Formats"></nav>
-    <div class="eyebrow"><b>05</b><span class="rule"></span><span>Content Flick · Creator reel</span></div>
+    <div class="eyebrow"><b>03</b><span class="rule"></span><span>Content Flick · Creator reel</span></div>
     <h2>Get ready with me, <span class="serif">your way.</span></h2>
     <p class="one">Switch the look without leaving the reel.</p>
     <div class="tags"><span class="tag ">GRWM</span><span class="tag warn">Concept</span></div>
@@ -949,15 +858,15 @@ main{position:relative;z-index:1}
 </section>
 
 <!-- ═════════ 09 MICRODRAMA BETWEEN REELS ═════════ -->
-<section class="fmt cf-sec" id="f9" data-kind="reelflick" data-name="06 · MicroDrama between reels" data-state="r1">
+<section class="fmt cf-sec" id="f9" data-kind="reelflick" data-name="04 · MicroDrama between reels" data-state="r1">
  <div class="fmt-in">
   <div class="copy">
     <nav class="fmtlist" aria-label="Formats"></nav>
-    <div class="eyebrow"><b>06</b><span class="rule"></span><span>Content Flick · Sponsored reel</span></div>
-    <h2>A micro-drama <span class="serif">in your language.</span></h2>
-    <p class="one">Switch the audio mid-scene: EN, KN, JA, ES.</p>
-    <div class="tags"><span class="tag ">MicroDrama</span><span class="tag ">Install CTA</span><span class="tag warn">Concept</span></div>
-    <ol class="steps"><li data-at="r1">Scroll</li><li data-at="live">Pick a language</li></ol>
+    <div class="eyebrow"><b>04</b><span class="rule"></span><span>Content Flick · Sponsored reel</span></div>
+    <h2>A micro-drama <span class="serif">you can shop.</span></h2>
+    <p class="one">Blank Cheque, episode 3. Shop the scene, then the story carries on.</p>
+    <div class="tags"><span class="tag ">Blank Cheque · Ep. 3</span><span class="tag ">Shoppable</span><span class="tag warn">Concept</span></div>
+    <ol class="steps"><li data-at="r1">Scroll</li><li data-at="live">Shop the scene</li></ol>
     <button class="replay" data-replay><i data-ic="replay"></i>Replay</button>
   </div>
   <div class="stage"><div class="phone"><div class="sw">
@@ -967,7 +876,7 @@ main{position:relative;z-index:1}
       <div data-img="goa" style="background:#111"><span class="im-shade"></span></div>
       <div style="background:#000"><div data-slot style="position:absolute;left:0;right:0;top:calc(var(--sbh) + 48px);bottom:calc(var(--tbh) + 68px)"></div></div>
     </div>
-    <div class="media" data-media style="--tint:#000;background:#000"><div class="mi full fill"><iframe class="cfr" src="https://microdrama-audio-diff.vercel.app/" title="MicroDrama between reels" loading="lazy" allow="fullscreen; clipboard-write"></iframe></div></div>
+    <div class="media" data-media style="--tint:#000;background:#000"><div class="mi full fill"><iframe class="cfr" src="https://flamdesign.github.io/FlicksLibrary/preview/blank-cheque-s1e03-bd4186/" title="Blank Cheque, episode 3" loading="lazy" allow="fullscreen; clipboard-write"></iframe></div></div>
     <div class="r-head" style="z-index:25"><span>Reels</span><i data-ic="camera"></i></div>
     <div class="r-side cfo" style="z-index:25"><span><i data-ic="heart"></i><b class="cf-b">12.4K</b><b class="cf-a">31.8K</b></span><span><i data-ic="comment"></i>418</span><span><i data-ic="send"></i>1.9K</span><span><i data-ic="more"></i></span></div>
     <div class="r-cap cfo" style="z-index:25;pointer-events:none">
@@ -975,7 +884,7 @@ main{position:relative;z-index:1}
       <div class="cf-b">Golden hour from the cliff café</div>
       <div class="who cf-a"><span class="av" style="background:#2b3a67">E</span>episode.club<em>Follow</em></div>
       <span class="cf-tag cf-a"><i data-ic="play"></i>Sponsored</span>
-      <div class="cf-a">Ep. 2 · Same scene, your language. Tap to switch.</div>
+      <div class="cf-a">Blank Cheque · Ep. 3. Shop the scene, the story waits.</div>
       <div class="mus"><i data-ic="music"></i>Original audio</div>
     </div>
     <div class="r-ctab cfo cf-a" style="z-index:25;opacity:1;background:rgba(255,255,255,.18);pointer-events:none"><span>Watch the full series</span><i data-ic="chev"></i></div>
@@ -987,6 +896,123 @@ main{position:relative;z-index:1}
   </div></div></div>
  </div>
 </section>
+
+<!-- ═════════ 04 CREATOR REEL → LINK IN BIO ═════════ -->
+<section class="fmt lk-sec" id="f4" data-kind="creator" data-name="05 · Creator profile → link in bio" data-state="profile">
+ <div class="fmt-in">
+  <div class="copy">
+    <nav class="fmtlist" aria-label="Formats"></nav>
+    <div class="eyebrow"><b>05</b><span class="rule"></span><span>Link · Creator profile</span></div>
+    <h2>One on camera. <span class="serif">Two more behind the link.</span></h2>
+    <p class="one">Link in bio opens the Flick inside Instagram.</p>
+    <div class="tags"><span class="tag ">Necklace Swap</span><span class="tag ">Creator or affiliate</span></div>
+    <ol class="steps"><li data-at="profile">Profile</li><li data-at="tap">Bio link</li><li data-at="iab">Try on</li></ol>
+    <button class="replay" data-replay><i data-ic="replay"></i>Replay</button>
+  </div>
+  <div class="stage"><div class="phone"><div class="sw">
+   <div class="screen reels" data-screen>
+    <div class="sb lt"><span>9:41</span><span class="ind"><span class="bars4"><span style="height:4px"></span><span style="height:6px"></span><span style="height:8px"></span><span style="height:11px"></span></span><span class="bat"></span></span></div>
+    <div class="reel-bg" data-img="ria" style="background:#2a0f1b"><span class="im-shade"></span></div>
+    <div class="r-head"><span>Reels</span><i data-ic="camera"></i></div>
+    <div class="r-side"><span><i data-ic="heart"></i>48.2K</span><span><i data-ic="comment"></i>612</span><span><i data-ic="send"></i>2.1K</span><span><i data-ic="more"></i></span></div>
+    <div class="r-cap">
+      <div class="who" data-toprofile style="cursor:pointer"><span class="av" style="background:#7a3048">R</span>ria.wears<em>Follow</em></div>
+      <div>Tried 1 of the 3 pieces from the new drop. Want to see how the other 2 look on me? <mark>Link in bio</mark></div>
+      <div class="mus"><i data-ic="music"></i>Original audio · ria.wears</div>
+    </div>
+    <nav class="tabbar ig-tabs"><i data-ic="home"></i><i data-ic="search"></i><i data-ic="plusbox"></i><i data-ic="reels"></i><span class="me"></span></nav>
+    <div class="prof">
+      <div class="spacer"></div>
+      <div class="prof-bar"><i data-ic="back"></i><span>ria.wears</span><span class="sp"></span><i data-ic="bell"></i><i data-ic="more"></i></div>
+      <div class="prof-top"><span class="ring"><div data-img="ria" style="background:#2a0f1b"></div></span><span class="stats"><span><b>412</b>posts</span><span><b>86.4K</b>followers</span><span><b>310</b>following</span></span></div>
+      <div class="bio"><b>Ria Kapoor</b><span class="cat">Fashion stylist</span><span>Jewellery and everyday styling · Mumbai</span><span>New drop: try every piece on me</span>
+        <button class="biolink press" data-link><i data-ic="link"></i>flicks.flamapp.ai/ria-necklaces</button></div>
+      <div class="prof-btns"><span>Follow</span><span>Message</span></div>
+      <div class="hls"><span><b data-img="earrings"></b>New drop</span><span><b data-img="ria"></b>Try-ons</span><span><b data-img="goa"></b>Travel</span><span><b data-img="mirror"></b>GRWM</span></div>
+      <div class="pgrid">
+        <span data-img="ria"></span><span data-img="earrings"></span><span data-img="mirror"></span>
+        <span data-img="cafe"></span><span data-img="marine"></span><span data-img="goa"></span>
+      </div>
+    </div>
+    <div class="iab">
+      <div class="iab-bar"><button data-iabclose aria-label="Close browser"><i data-ic="x"></i></button><span class="iab-t"><b>Necklace Swap</b><small><i data-ic="lock"></i>flicks.flamapp.ai</small></span><i data-ic="more"></i></div>
+      <div class="iab-page" style="--lp:#1c0f15">
+        <div class="lp-head"><span>Necklace Swap</span><span>× ria.wears</span></div>
+        <div class="lp-stage"><div class="lp-slot tall" data-slot></div></div>
+      </div>
+    </div>
+    <div class="media" data-media style="--tint:#2a1620"><div class="mi">
+      <div class="flick-lazy" data-fid="ikutv6" data-ar="1080/1920"></div>
+    </div></div>
+    <div class="island"></div>
+   </div>
+  </div></div></div>
+ </div>
+</section>
+
+<!-- ═════════ 05 STORY LINK STICKER ═════════ -->
+<section class="fmt lk-sec" id="f5" data-kind="sticker" data-name="06 · Story link sticker" data-state="story">
+ <div class="fmt-in">
+  <div class="copy">
+    <nav class="fmtlist" aria-label="Formats"></nav>
+    <div class="eyebrow"><b>06</b><span class="rule"></span><span>Link · Story sticker</span></div>
+    <h2>"Which fit tonight?" <span class="serif">Swap them on me.</span></h2>
+    <p class="one">A link sticker opens the Gap Flick in-app.</p>
+    <div class="tags"><span class="tag ">Gap</span><span class="tag ">Organic or boosted</span></div>
+    <ol class="steps"><li data-at="story">Story</li><li data-at="tap">Sticker</li><li data-at="iab">Try fits</li></ol>
+    <button class="replay" data-replay><i data-ic="replay"></i>Replay</button>
+  </div>
+  <div class="stage"><div class="phone"><div class="sw">
+   <div class="screen story" data-screen>
+    <div class="sb lt"><span>9:41</span><span class="ind"><span class="bars4"><span style="height:4px"></span><span style="height:6px"></span><span style="height:8px"></span><span style="height:11px"></span></span><span class="bat"></span></span></div>
+    <div class="stw">
+      <div class="cs-photo" data-img="kabir"></div>
+      <div class="cs-text"><span>Can't decide on tonight's fit.</span><br><span>Swap them on me and tell me which one</span></div>
+      <button class="sticker" data-link style="top:58%"><i data-ic="link"></i>Try the fits on me</button>
+      <div class="st-reply"><span class="in">Send message</span><i data-ic="heart"></i><i data-ic="send"></i></div>
+    </div>
+    <div class="st-top">
+      <div class="bars"><span><i data-bar></i></span></div>
+      <div class="st-row always"><span class="av" style="background:#6a5acd">K</span><b>kabir.fits</b><span>38m</span><span class="x"><i data-ic="more"></i><i data-ic="x"></i></span></div>
+    </div>
+    <div class="iab dark">
+      <div class="iab-bar"><button data-iabclose aria-label="Close browser"><i data-ic="x"></i></button><span class="iab-t"><b>Gap</b><small><i data-ic="lock"></i>native-ads.appless.workers.dev</small></span><i data-ic="more"></i></div>
+      <div class="iab-page" style="--lp:#000"><div data-slot style="flex:1;min-height:0"></div></div>
+    </div>
+    <div class="media" data-media style="--tint:#000;background:#000"><div class="mi full fill">
+      <iframe
+        src="https://native-ads.appless.workers.dev/6a9eb4cd93e71f3ec92010f1_im75ys"
+        allow="fullscreen; camera; microphone"
+        allowFullScreen
+        title="Gap"
+        class="cfr"
+        style="border:0;display:block;background:#000">
+      </iframe>
+    </div></div>
+    <div class="island"></div>
+   </div>
+  </div></div></div>
+ </div>
+</section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 </main>
@@ -1064,7 +1090,7 @@ paintIcons(document);
 // ── journeys ──
 const ORDER = {
   feed:['browse','scroll','leadin','play'], story:['leadin','play','s1','s2'], reward:['browse','offer','play','done'],
-  creator:['reel','profile','tap','iab'], sticker:['story','tap','iab'], partner:['browse','scroll','tap','iab'], chat:['chat','msg','tap','iab','reply','confirm'],
+  creator:['profile','tap','iab'], sticker:['story','tap','iab'], partner:['browse','scroll','tap','iab'], chat:['chat','msg','tap','iab','reply','confirm'],
   reelflick:['r1','live'],
   market:['browse','open','detail','pick','send','chat','reply','order','done']
 };
@@ -1072,7 +1098,7 @@ const SCRIPT = {
   feed:[[700,'scroll'],[3300,'leadin'],[6300,'play']],
   story:[[3500,'play']],
   reward:[[2200,'offer'],[4800,'play']],
-  creator:[[3600,'profile'],[6000,'tap'],[6700,'iab']],
+  creator:[[3400,'tap'],[4100,'iab']],
   sticker:[[3400,'tap'],[4100,'iab']],
   partner:[[700,'scroll'],[3800,'tap'],[4500,'iab']],
   chat:[[1600,'msg'],[4800,'tap'],[5500,'iab'],[14500,'reply']],
@@ -1419,11 +1445,11 @@ secs.forEach(s => io.observe(s.el));
 // phone: one demo per page, chosen with the header arrows or a sideways swipe on the header
 const MT = [
   ['Playable ad','Instagram Stories','var(--accent)'],
-  ['In-app link','Creator reel → link in bio','var(--link)'],
-  ['In-app link','Story link sticker','var(--link)'],
   ['In-app link','Partnership ad · Shop now','var(--link)'],
   ['Content Flick','Get Ready With Me reel','var(--cf)'],
-  ['Content Flick','MicroDrama between reels','var(--cf)']
+  ['Content Flick','MicroDrama between reels','var(--cf)'],
+  ['In-app link','Creator profile → link in bio','var(--link)'],
+  ['In-app link','Story link sticker','var(--link)']
 ];
 const mh = document.querySelector('.mhead'), mprog = mh.querySelector('[data-mprog]');
 mprog.innerHTML = secs.map(() => '<span></span>').join('');
@@ -1507,6 +1533,39 @@ addEventListener('wheel', e => {
   wAcc += e.deltaY; if (Math.abs(wAcc) < 120) return;
   mShow(mIdx + (wAcc > 0 ? 1 : -1)); wAcc = 0; wLock = now + 900;
 }, { passive: true });
+// swipe up / down on the phone to change format (phone and web), unless the content under the finger can still scroll
+let tY = null, tX = 0, tT = 0, tEl = null;
+addEventListener('touchstart', e => { const t = e.touches[0]; tY = t.clientY; tX = t.clientX; tT = Date.now(); tEl = e.target; }, { passive: true });
+addEventListener('touchend', e => {
+  if (tY == null) return; const t = e.changedTouches[0]; const dy = tY - t.clientY, dx = tX - t.clientX, el = tEl; tY = null;
+  if (Date.now() - tT > 900 || Math.abs(dy) < 60 || Math.abs(dy) < Math.abs(dx) * 1.3) return;
+  if (el && el.closest && el.closest('.mhead,.fmtlist')) return;
+  if (scrollerFor(el, dy)) return;
+  mShow(mIdx + (dy > 0 ? 1 : -1));
+}, { passive: true });
+let mDown = null;
+addEventListener('pointerdown', e => {
+  if (e.pointerType !== 'mouse' || !(e.target.closest && e.target.closest('.phone'))) return;
+  mDown = { y: e.clientY, x: e.clientX, t: Date.now(), el: e.target };
+  try { e.target.setPointerCapture(e.pointerId); } catch (x) {}   // keep the release even if the drag ends over a Flick
+});
+addEventListener('pointerup', e => {
+  if (e.pointerType !== 'mouse' || !mDown) return; const d = mDown; mDown = null; const dy = d.y - e.clientY, dx = d.x - e.clientX;
+  if (Date.now() - d.t > 900 || Math.abs(dy) < 80 || Math.abs(dy) < Math.abs(dx) * 1.3) return;
+  if (!(d.el && d.el.closest && d.el.closest('.phone'))) return;
+  if (scrollerFor(d.el, dy)) return;
+  mShow(mIdx + (dy > 0 ? 1 : -1));
+});
+// gestures reported by Flicks that run inside the page (the ad tags)
+addEventListener('message', e => {
+  const d = e.data; if (!d || d.type !== 'flick-gesture') return;
+  if (typeof d.swipe === 'number') { mShow(mIdx + (d.swipe > 0 ? 1 : -1)); return; }
+  if (typeof d.wheel === 'number' && !mq.matches) {
+    const now = Date.now(); if (now < wLock) { wLock = now + 250; return; }
+    wAcc += d.wheel; if (Math.abs(wAcc) < 120) return;
+    mShow(mIdx + (wAcc > 0 ? 1 : -1)); wAcc = 0; wLock = now + 900;
+  }
+});
 function modeChange() {
   mShow(current ? current.i : mIdx);
 }
