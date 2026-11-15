@@ -792,7 +792,9 @@ html.room::-webkit-scrollbar,html.room body::-webkit-scrollbar{display:none}
 #f2[data-state="ad"] .media .mi{pointer-events:auto;height:100%;width:100%;box-sizing:border-box;padding:calc(var(--sbh) + 52px) 0 14px;display:flex;align-items:center;justify-content:center;container-type:size}
 #f2[data-state="ad"] .media .mi :is(.ad0,.ad1,.flick-lazy){display:contents}
 #f2[data-state="ad"] .media .mi flam-embed{flex:none;width:min(100cqw, calc(100cqh * 9 / 16))!important}
-#f2[data-ad="1"][data-state="ad"] .ad0,#f2:not([data-ad="1"])[data-state="ad"] .ad1{display:none!important}
+/* both story Flicks stay loaded while the stories play: the one that is not on screen sits underneath, invisible and
+   untappable, so it is already playing when its turn comes instead of showing its blank page while it loads */
+#f2[data-ad="1"][data-state="ad"] .ad0 flam-embed,#f2:not([data-ad="1"])[data-state="ad"] .ad1 flam-embed{position:absolute!important;opacity:0!important;pointer-events:none!important}
 
 
 /* closing */
@@ -1327,7 +1329,11 @@ function storyNext(s) {
 function storyGo(s, n) {
   n = n > 1 ? 0 : Math.max(0, n);
   stopTimers(s);
-  disengage(s, true);   // the Flick that was on goes quiet
+  // the Flick that was on goes quiet and restarts out of sight; the one coming on is left alone, already loaded
+  const leaving = s.el.querySelector(s.adIdx ? '.ad1' : '.ad0'), a = document.activeElement;
+  s.engaged = false; s.el.classList.remove('eng'); applyAudio(s, false);
+  if (n !== s.adIdx && leaving) leaving.querySelectorAll('iframe').forEach(reloadFrame);
+  if (a && a !== document.body && s.media.contains(a)) { try { a.blur(); } catch (e) {} try { window.focus(); } catch (e) {} }
   s.adIdx = n; s.el.dataset.ad = String(n); setState(s, 'ad');
 }
 function openStory(s) {
@@ -1634,7 +1640,12 @@ function mountLazy(s) {
     const f = document.createElement('iframe');
     f.setAttribute('allow', 'autoplay; fullscreen; encrypted-media; picture-in-picture'); f.setAttribute('allowfullscreen', ''); f.setAttribute('scrolling', 'no');
     f.title = 'Flam Flicks'; f.dataset.autoplay = '1'; f.dataset.flick = id;
-    f.style.cssText = 'display:block;width:100%;height:100%;border:0;background:transparent';
+    f.style.cssText = 'display:block;width:100%;height:100%;border:0;background:transparent;opacity:0;transition:opacity .3s ease';
+    // a Flick's page is blank white until its video is ready: keep the frame invisible until it has loaded, then fade it in
+    let shownT = null;
+    const reveal = ms => { clearTimeout(shownT); shownT = setTimeout(() => { f.style.opacity = '1'; }, ms); };
+    f.addEventListener('load', () => { if ((f.getAttribute('src') || '').indexOf('about:') === 0) { clearTimeout(shownT); f.style.opacity = '0'; return; } reveal(900); });
+    reveal(9000);   // never leave it hidden for good
     f.src = FLICK_SRC(id);
     fe.appendChild(f); ph.appendChild(fe);
   });
