@@ -4,9 +4,9 @@ Interactive proof of concept by Flam: Flicks (swappable, interactive videos) ins
 
 1. **Flicks in Stories**: two story ads that are Flicks (Gucci, then Necklace Swap)
 2. **Flicks in Post**: a sponsored post whose media is the Nike Flick, swappable inside the post. Shop now goes to nike.com
-3. **Flicks in Reels**: three reels, each one a Flick with the Reels UI over it (Get Ready With Me, Puffer jacket swap, Necklace swap)
+3. **Flicks in Reels**: three sponsored reels, each one a Flick with a minimal Reels UI over it (Get Ready With Me, Puffer jacket swap, Necklace swap)
 
-On a laptop, pick a format from the list, or use the arrow keys or the scroll wheel. On a phone, each format is full screen; swipe up or down to move between them. Inside Reels, a swipe or scroll moves to the next reel first.
+On a laptop, pick a format from the list, or use the arrow keys or the scroll wheel. On a phone, each format is full screen; swipe up or down to move between them. Inside Reels, a swipe or scroll moves to the next reel first. On a phone, the draggable Formats button opens the list of formats; tap one to go straight to it.
 
 ## Hosting on Vercel
 Import this repository in Vercel (Add New → Project), framework preset **Other**, no build command, root directory unchanged. Every push to `main` redeploys.

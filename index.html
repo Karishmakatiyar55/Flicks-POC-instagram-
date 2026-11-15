@@ -7,6 +7,8 @@
 <title>Flicks on Instagram</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://native-ads-dev.appless.workers.dev">
+<link rel="preconnect" href="https://flicks.flamapp.live">
 <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700&family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Grand+Hotel&display=swap" rel="stylesheet">
 <style>
 /* Layout: desktop = narrative column + iPhone (402x874pt) scaled to viewport; mobile = each journey is one full-screen snap page, ad only */
@@ -470,16 +472,58 @@ a.ig-cta{text-decoration:none}
 .fmt[data-kind="partner"] .media{cursor:default}
 .fmt[data-kind="partner"] .media .mi{pointer-events:auto}
 
-/* Flicks in Reels: every reel is a Flick, full height, with the Reels UI laid over it */
+/* Flicks in Reels: every reel is a sponsored Flick, full height. All three load together when Reels opens (the two
+   that are not on screen sit underneath, invisible), so the next reel is already playing when it slides in. */
 .rl-slot{position:absolute;left:0;right:0;top:var(--sbh);bottom:var(--tbh)}
 .fmt[data-kind="reels"] .cf-track{transition:transform .5s cubic-bezier(.2,.8,.2,1)}
-.fmt[data-kind="reels"] .media .mi[data-reel]:not(.on){display:none}
+.fmt[data-kind="reels"] .media .mi[data-reel]{position:absolute;inset:0}
+.fmt[data-kind="reels"] .media .mi[data-reel]:not(.on){opacity:0;pointer-events:none!important}
+.fmt[data-kind="reels"] .media .mi[data-reel]::before{content:"";position:absolute;left:50%;top:50%;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;border:2.5px solid rgba(255,255,255,.16);border-top-color:rgba(255,255,255,.85);animation:rlSpin .8s linear infinite}
+@keyframes rlSpin{to{transform:rotate(360deg)}}
+.fmt[data-kind="reels"] .media .mi[data-reel] > *{position:relative}
+.fmt[data-kind="reels"] .media iframe.cfr{background:transparent}
 .fmt[data-kind="reels"] .media .mi[data-reel] .flick-lazy{display:contents}
-.fmt[data-kind="reels"] .media .mi[data-reel] flam-embed{flex:none;width:min(100cqw, calc(100cqh * 9 / 16))!important}
-.rl-ov{z-index:25;pointer-events:none;text-shadow:0 1px 3px rgba(0,0,0,.55)}
-.rl-ov .r-side{bottom:calc(var(--tbh) + 72px);filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))}
-.rl-ov .r-cap{bottom:calc(var(--tbh) + 12px)}
-.rl-ov .r-cap .who .av{position:relative;overflow:hidden;text-shadow:none}
+.fmt[data-kind="reels"] .media .mi[data-reel] flam-embed{position:relative;flex:none;width:min(100cqw, calc(100cqh * 9 / 16))!important}
+/* Reels UI over the Flick, kept minimal and placed clear of each Flick's own buttons. Everything is positioned
+   inside a box that matches the Flick's 9:16 frame, so it stays clear at every screen size.
+   GRWM and Puffer jacket: variants run along the bottom (from about 82% down), so the rail and the name stop at 79%.
+   Necklace: variants run down the right side (55% to 91%) and its logo is top-left, so the rail sits above them. */
+.rl-ov{z-index:25;pointer-events:none;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.rl-box{position:absolute;left:0;right:0;top:var(--sbh);bottom:var(--tbh);container-type:size;display:flex;align-items:center;justify-content:center}
+.rl-frame{position:relative;flex:none;width:min(100cqw, calc(100cqh * 9 / 16));height:min(100cqh, calc(100cqw * 16 / 9))}
+.rl-rail{position:absolute;right:8px;bottom:21%;display:flex;flex-direction:column;align-items:center;gap:14px;font-size:11.5px;font-weight:600;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))}
+.rl-rail span{display:flex;flex-direction:column;align-items:center;gap:3px}
+.rl-rail i[data-ic]{width:26px;height:26px}
+.rl-frame.side .rl-rail{bottom:48%}
+.rl-meta{position:absolute;left:12px;bottom:21%;max-width:60%;display:flex;flex-direction:column;align-items:flex-start;gap:7px}
+.rl-meta .who{display:flex;align-items:center;gap:8px}
+.rl-meta .av{width:28px;height:28px;font-size:12px;position:relative;overflow:hidden;text-shadow:none}
+.rl-meta .nm{display:flex;flex-direction:column;gap:1px;line-height:1.15}
+.rl-meta .nm b{font-size:13.5px;font-weight:600}
+.rl-meta .nm small{font-size:11.5px;font-weight:500}
+.rl-hint{display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px 0 7px;border-radius:11px;background:rgba(0,0,0,.5);font-size:11.5px;font-weight:600;text-shadow:none;white-space:nowrap}
+.rl-hint i[data-ic]{width:13px;height:13px}
+.fmt[data-kind="reels"] .r-head span{transition:opacity .25s}
+.fmt[data-kind="reels"][data-reel="2"] .r-head span{opacity:0}   /* the necklace Flick has its own logo top-left */
+
+/* phone view: a small draggable "Formats" button; a tap opens the three formats, a tap on one goes straight to it */
+.fmjump{display:none;position:fixed;z-index:9300;left:0;top:0;font-family:var(--f-page);color:#fff;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+@media (max-width:760px){.fmjump{display:block}}
+.fmj-pill{display:flex;align-items:center;gap:6px;height:34px;padding:0 12px 0 10px;border-radius:17px;background:rgba(18,13,11,.78);border:1px solid rgba(255,255,255,.22);box-shadow:0 6px 20px rgba(0,0,0,.45);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);font-size:12.5px;font-weight:600;color:#fff;cursor:grab}
+.fmj-pill i[data-ic]{width:15px;height:15px}
+.fmj-panel{display:none;width:226px;border-radius:16px;background:rgba(18,13,11,.9);border:1px solid rgba(255,255,255,.2);box-shadow:0 10px 30px rgba(0,0,0,.55);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);overflow:hidden}
+.fmjump.open .fmj-pill{display:none}
+.fmjump.open .fmj-panel{display:block}
+.fmj-top{display:flex;align-items:center;justify-content:space-between;padding:9px 8px 7px 13px;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.7);cursor:grab}
+.fmj-min{width:28px;height:28px;border-radius:9px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.1);color:#fff}
+.fmj-min::before{content:"";width:11px;height:2px;border-radius:1px;background:currentColor}
+.fmj-item{display:grid;grid-template-columns:20px 1fr;gap:1px 8px;width:100%;box-sizing:border-box;text-align:left;padding:9px 13px;border-top:1px solid rgba(255,255,255,.09);color:#fff}
+.fmj-item .n{grid-row:span 2;font-size:11px;color:rgba(255,255,255,.5);padding-top:2px;font-variant-numeric:tabular-nums}
+.fmj-item b{font-size:14px;font-weight:600}
+.fmj-item small{font-size:11.5px;color:rgba(255,255,255,.66)}
+.fmj-item.on{background:rgba(237,180,158,.16)}
+.fmj-item.on .n{color:var(--accent)}
+
 button.tag{cursor:pointer;transition:background .25s,border-color .25s}
 button.tag.on{background:rgba(210,178,242,.14);border-color:rgba(210,178,242,.5)}
 
@@ -922,7 +966,7 @@ addEventListener(&#x27;wheel&#x27;,function(e){parent.postMessage({type:&#x27;fl
     <nav class="fmtlist" aria-label="Formats"></nav>
     <div class="eyebrow"><b>03</b><span class="rule"></span><span>Flicks in Reels</span></div>
     <h2>The reel <span class="serif">is the Flick.</span></h2>
-    <p class="one">Three reels, each one a Flick. Swap inside the reel, then swipe up for the next.</p>
+    <p class="one">Three sponsored reels, each one a Flick. Swap inside the reel, then swipe up for the next.</p>
     <div class="tags"><button type="button" class="tag" data-reel-go="0">Get Ready With Me</button><button type="button" class="tag" data-reel-go="1">Puffer jacket swap</button><button type="button" class="tag" data-reel-go="2">Necklace swap</button></div>
     <button class="replay" data-replay><i data-ic="replay"></i>Replay</button>
   </div>
@@ -966,32 +1010,29 @@ addEventListener(&#x27;wheel&#x27;,function(e){parent.postMessage({type:&#x27;fl
 &lt;script src=https://native-ads-dev.appless.workers.dev/flicks2-jacket-p1/ad.js&gt;&lt;/script&gt;"></iframe></div>
       <div class="mi full" data-reel="2"><div class="flick-lazy" data-fid="ikutv6" data-ar="1080/1920"></div></div>
     </div>
-    <!-- Reels UI laid over each Flick: action rail on the right, creator and caption at the bottom. Taps pass through to the Flick. -->
+    <!-- Reels UI laid over each Flick, kept minimal: action rail, name with a Sponsored label, one hint. Taps pass through to the Flick. -->
     <div class="cf-track rl-ov" data-rtrack>
-      <div>
-        <div class="r-side"><span><i data-ic="heart"></i>31.8K</span><span><i data-ic="comment"></i>418</span><span><i data-ic="send"></i>1.9K</span><span><i data-ic="more"></i></span></div>
-        <div class="r-cap">
-          <div class="who"><span class="av" data-img="ria" style="background:#7a3048"></span>ria.wears<em>Follow</em></div>
-          <div>GRWM for a Friday dinner. Tap to switch my look</div>
-          <div class="mus"><i data-ic="music"></i>Original audio · ria.wears</div>
+      <div><div class="rl-box"><div class="rl-frame">
+        <div class="rl-rail"><span><i data-ic="heart"></i>31.8K</span><span><i data-ic="comment"></i>418</span><span><i data-ic="send"></i>1.9K</span></div>
+        <div class="rl-meta">
+          <div class="who"><span class="av" data-img="ria" style="background:#7a3048"></span><span class="nm"><b>ria.wears</b><small>Sponsored</small></span></div>
+          <span class="rl-hint"><i data-ic="tap"></i>Tap a dress to swap</span>
         </div>
-      </div>
-      <div>
-        <div class="r-side"><span><i data-ic="heart"></i>24.6K</span><span><i data-ic="comment"></i>302</span><span><i data-ic="send"></i>1.1K</span><span><i data-ic="more"></i></span></div>
-        <div class="r-cap">
-          <div class="who"><span class="av" style="background:#3a7d5c">K</span>kiran.p<em>Follow</em></div>
-          <div>Three puffers, one fit check. Tap to swap the jacket</div>
-          <div class="mus"><i data-ic="music"></i>Original audio · kiran.p</div>
+      </div></div></div>
+      <div><div class="rl-box"><div class="rl-frame">
+        <div class="rl-rail"><span><i data-ic="heart"></i>24.6K</span><span><i data-ic="comment"></i>302</span><span><i data-ic="send"></i>1.1K</span></div>
+        <div class="rl-meta">
+          <div class="who"><span class="av" style="background:#3a7d5c">K</span><span class="nm"><b>kiran.p</b><small>Sponsored</small></span></div>
+          <span class="rl-hint"><i data-ic="tap"></i>Tap a jacket to swap</span>
         </div>
-      </div>
-      <div>
-        <div class="r-side"><span><i data-ic="heart"></i>48.2K</span><span><i data-ic="comment"></i>612</span><span><i data-ic="send"></i>2.1K</span><span><i data-ic="more"></i></span></div>
-        <div class="r-cap">
-          <div class="who"><span class="av" style="background:linear-gradient(135deg,#ffd166,#ef476f)">A</span>aisha_m<em>Follow</em></div>
-          <div>New drop, three necklaces. Tap to try each one</div>
-          <div class="mus"><i data-ic="music"></i>Original audio · aisha_m</div>
+      </div></div></div>
+      <div><div class="rl-box"><div class="rl-frame side">
+        <div class="rl-rail"><span><i data-ic="heart"></i>48.2K</span><span><i data-ic="comment"></i>612</span><span><i data-ic="send"></i>2.1K</span></div>
+        <div class="rl-meta">
+          <div class="who"><span class="av" style="background:linear-gradient(135deg,#ffd166,#ef476f)">A</span><span class="nm"><b>aisha_m</b><small>Sponsored</small></span></div>
+          <span class="rl-hint"><i data-ic="tap"></i>Tap a necklace to swap</span>
         </div>
-      </div>
+      </div></div></div>
     </div>
     <div class="r-head" style="z-index:25"><span>Reels</span><i data-ic="camera"></i></div>
     <nav class="tabbar ig-tabs" style="z-index:24"><i data-ic="home"></i><i data-ic="search"></i><i data-ic="plusbox"></i><i data-ic="reels"></i><span class="me"></span></nav>
@@ -1237,7 +1278,8 @@ function openStory(s) {
   stopTimers(s); s.adIdx = 0; s.el.dataset.ad = '0'; setState(s, 'ad');
 }
 function storyPos(s) { return s.state === 'ad' ? (s.adIdx || 0) : s.state === 's1' ? 2 : 3; }
-// Reels: every reel is a Flick. A swipe or scroll moves to the next reel; only the reel on screen is loaded.
+// Reels: every reel is a Flick. A swipe or scroll moves to the next reel. All three load when Reels opens and stay
+// loaded (silent) while it is open, so the next reel does not start loading only when it arrives.
 const REEL_NAMES = ['Get Ready With Me', 'Puffer jacket swap', 'Necklace swap'];
 function reelSet(s, n) {
   s.reelIdx = n; s.el.dataset.reel = String(n);
@@ -1248,9 +1290,10 @@ function reelSet(s, n) {
 function reelGo(s, n) {
   n = Math.max(0, Math.min(s.reels.length - 1, n));
   if (n === s.reelIdx) return false;
+  const was = s.engaged, old = s.reels[s.reelIdx];
   reelSet(s, n);
-  park(s, s === current);   // the reel that was on is unloaded, so it cannot keep playing unseen
-  disengage(s);
+  s.engaged = false; s.el.classList.remove('eng'); applyAudio(s, false);
+  if (was && old) old.querySelectorAll('iframe').forEach(reloadFrame);   // sound was on in the reel just left: restart it silent
   paintNav();
   return true;
 }
@@ -1273,7 +1316,7 @@ function start(s) {
   clearAll(s);
   s.anim = false; s.media.style.transition = ''; s.canClose = false;
   if (s.kind === 'story') { s.adIdx = 0; s.el.dataset.ad = '0'; }
-  if (s.kind === 'reels') { reelSet(s, 0); park(s, s === current); paintNav(); }
+  if (s.kind === 'reels') { reelSet(s, 0); paintNav(); }
   s.el.classList.remove('arrived');
   setState(s, ORDER[s.kind][0]);
   follow(s);
@@ -1574,9 +1617,7 @@ mh.addEventListener('touchend', e => { if (tx == null) return; const d = e.chang
 function park(s, live) {
   const [, frames] = parts(s);
   frames.forEach(f => {
-    // Reels: only the reel on screen is loaded; the other reels stay parked
-    const host = s.kind === 'reels' && f.ownerDocument === document ? f.closest('[data-reel]') : null;
-    if (!live || (host && +host.dataset.reel !== s.reelIdx)) {
+    if (!live) {
       if (f._park) return;
       f._park = { src: f.getAttribute('src'), srcdoc: f.getAttribute('srcdoc') };
       if (f._park.srcdoc != null) f.removeAttribute('srcdoc');
@@ -1712,7 +1753,53 @@ addEventListener('scroll', () => {
   roomT = setTimeout(() => { roomHome(); roomDrag(0, true); }, 140);
 }, { passive: true });
 
+// Phone view: a small draggable "Formats" button. A tap opens the list of formats; a tap on one shows it; "–" minimises it.
+const JUMP = [['Instagram Stories', 'Story ads you can swap'], ['Instagram Feed', 'A sponsored post you can swap'], ['Instagram Reels', 'Sponsored reels you can swap']];
+const fj = document.createElement('div'); fj.className = 'fmjump';
+fj.innerHTML = '<button type="button" class="fmj-pill" aria-label="Show formats"><i data-ic="menu"></i>Formats</button>'
+  + '<div class="fmj-panel"><div class="fmj-top"><span>Flicks on Instagram</span><button type="button" class="fmj-min" aria-label="Minimise"></button></div>'
+  + JUMP.map((t, i) => '<button type="button" class="fmj-item" data-jump="' + i + '"><span class="n">' + (i + 1) + '</span><b>' + t[0] + '</b><small>' + t[1] + '</small></button>').join('') + '</div>';
+document.body.appendChild(fj); paintIcons(fj);
+let fjPos = null, fjDrag = null;
+function fjPlace(x, y) {
+  const w = fj.offsetWidth || 110, h = fj.offsetHeight || 34;
+  fjPos = { x: Math.max(8, Math.min(innerWidth - w - 8, x)), y: Math.max(8, Math.min(innerHeight - h - 8, y)) };
+  fj.style.left = fjPos.x + 'px'; fj.style.top = fjPos.y + 'px';
+}
+function fjFit() { if (!mq.matches) return; if (!fjPos) fjPlace(innerWidth, 112); else fjPlace(fjPos.x, fjPos.y); }
+function fjOpen(on) {
+  const right = fj.getBoundingClientRect().right;   // the list opens and closes from the button's right edge, so it stays where it was put
+  fj.classList.toggle('open', on);
+  fj.querySelectorAll('[data-jump]').forEach(b => b.classList.toggle('on', +b.dataset.jump === mIdx));
+  fjPlace(right - fj.offsetWidth, fjPos ? fjPos.y : 112);
+}
+fj.addEventListener('pointerdown', e => {
+  fjDrag = { id: e.pointerId, x: e.clientX, y: e.clientY, px: fjPos ? fjPos.x : 0, py: fjPos ? fjPos.y : 0, moved: false };
+  try { fj.setPointerCapture(e.pointerId); } catch (x) {}
+});
+fj.addEventListener('pointermove', e => {
+  if (!fjDrag || e.pointerId !== fjDrag.id) return;
+  const dx = e.clientX - fjDrag.x, dy = e.clientY - fjDrag.y;
+  if (!fjDrag.moved && Math.hypot(dx, dy) < 7) return;
+  fjDrag.moved = true; fjPlace(fjDrag.px + dx, fjDrag.py + dy);
+});
+function fjEnd(e) {
+  if (!fjDrag || e.pointerId !== fjDrag.id) return;
+  const d = fjDrag; fjDrag = null;
+  if (d.moved || e.type === 'pointercancel') return;   // it was a drag, not a tap
+  const t = document.elementFromPoint(e.clientX, e.clientY), hit = t && t.closest ? t : null;
+  if (!hit || !fj.contains(hit)) return;
+  const item = hit.closest('[data-jump]');
+  if (item) { fjOpen(false); userShow(+item.dataset.jump); return; }
+  if (hit.closest('.fmj-min')) { fjOpen(false); return; }
+  if (hit.closest('.fmj-pill')) fjOpen(true);
+}
+fj.addEventListener('pointerup', fjEnd); fj.addEventListener('pointercancel', fjEnd);
+['touchstart', 'touchend', 'wheel'].forEach(n => fj.addEventListener(n, e => e.stopPropagation(), { passive: true }));   // a drag on the button is never a format swipe
+addEventListener('resize', fjFit);
+
 function modeChange() {
+  fjFit();
   mShow(current ? current.i : mIdx);
 }
 
@@ -1724,7 +1811,7 @@ function fit() {
   document.documentElement.style.setProperty('--s', k.toFixed(4));
 }
 fit(); addEventListener('resize', fit); mq.addEventListener?.('change', () => { fit(); modeChange(); });
-mShow(0);
+mShow(0); fjFit();
 
 const loop = () => { secs.forEach(s => { if (s.near) follow(s); }); requestAnimationFrame(loop); };
 requestAnimationFrame(loop);
