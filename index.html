@@ -495,7 +495,7 @@ a.ig-cta{text-decoration:none}
 .fmt[data-kind="reels"]{--rl-band:34px}   /* strip under the Flick for the profile row, at Instagram's bottom-left spot */
 .fmt[data-kind="reels"] .cf-track{transition:transform .5s cubic-bezier(.2,.8,.2,1)}
 .fmt[data-kind="reels"] .media .mi[data-reel]{position:absolute;inset:0;box-sizing:border-box;padding-bottom:var(--rl-band);align-items:flex-end}
-.fmt[data-kind="reels"] .media .mi[data-reel]:not(.on){opacity:0;pointer-events:none!important}
+.fmt[data-kind="reels"] .media .mi[data-reel]:not(.on){opacity:.01;pointer-events:none!important}   /* 1%, not 0, so the waiting reels are already playing (see the stories note) */
 .fmt[data-kind="reels"] .media .mi[data-reel]::before{content:"";position:absolute;left:50%;top:50%;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;border:2.5px solid rgba(255,255,255,.16);border-top-color:rgba(255,255,255,.85);animation:rlSpin .8s linear infinite}
 @keyframes rlSpin{to{transform:rotate(360deg)}}
 .fmt[data-kind="reels"] .media .mi[data-reel] > *{position:relative}
@@ -796,7 +796,10 @@ html.room::-webkit-scrollbar,html.room body::-webkit-scrollbar{display:none}
 #f2[data-state="ad"] .media .mi{pointer-events:auto}
 #f2:is([data-state="splash"],[data-state="home"],[data-state="ad"]) .media .mi :is(.ad0,.ad1,.flick-lazy){display:contents}
 #f2:is([data-state="splash"],[data-state="home"],[data-state="ad"]) .media .mi flam-embed{grid-area:1/1;width:min(100cqw, calc(100cqh * 9 / 16))!important}
-#f2[data-ad="1"] .ad0 flam-embed,#f2:not([data-ad="1"]) .ad1 flam-embed{opacity:0!important;pointer-events:none!important}
+/* "invisible" here is 1% opacity, not 0: a Flick only starts playing once the browser is actually drawing it, and a Flick
+   that has never been drawn shows its blank white page for a few seconds the first time it appears */
+#f2[data-ad="1"] .ad0 flam-embed,#f2:not([data-ad="1"]) .ad1 flam-embed{opacity:.01!important;pointer-events:none!important}
+#f2:is([data-state="splash"],[data-state="home"]) .media{opacity:.01}
 
 
 /* closing */
@@ -1309,7 +1312,15 @@ function setState(s, st) {
     s.track.style.transform = 'translateX(-' + n * 100 + '%)';
     if (st !== 'play') runBars(s, n, n <= 1 ? STORY_MS[n] : 3000);
     if (st === 'ad') storyNext(s);
-    if (st === 'home') s.timers.push(setTimeout(() => { if (s.state === 'home') openStory(s); }, 2000));   // nobody tapped: the demo taps the Gucci story
+    if (st === 'home') {   // nobody tapped: the demo taps the Gucci story, once its Flick has had time to start (2 s at least, 8 s at most)
+      const t0 = Date.now();
+      const tryOpen = () => {
+        if (s.state !== 'home') return;
+        if (Date.now() - t0 < 8000 && !flickWarm(s.el.querySelector('.ad0 iframe'), 2500)) { s.timers.push(setTimeout(tryOpen, 300)); return; }
+        openStory(s);
+      };
+      s.timers.push(setTimeout(tryOpen, 2000));
+    }
     if (st === 's1') s.timers.push(setTimeout(() => { if (s.state === 's1') setState(s, 's2'); }, 3000));
   }
   if (s.kind === 'sticker') { if (st === 'story') runBars(s, 0, 9000); else freezeBars(s); }
@@ -1324,6 +1335,8 @@ function setState(s, st) {
 // follows; a tap on the story outside the Flick moves on (left third: back), the way Instagram stories work.
 // Taps inside the Flick stay with the Flick (that is where the variants are).
 const STORY_MS = [7000, 15000];   // how long each Flick story stays up: Gucci, then Necklace Swap
+// a Flick is ready to be shown once its page has loaded and it has had a moment to start playing out of sight
+function flickWarm(f, ms) { return !!f && !!f._ready && Date.now() - f._readyAt >= ms; }
 function storyNext(s) {
   const ad = s.adIdx;
   // two Flick stories, round and round. If the next story's Flick has not finished loading yet, hold the current one a
@@ -1331,7 +1344,7 @@ function storyNext(s) {
   const go = waited => {
     if (s.state !== 'ad' || s.adIdx !== ad) return;
     const nf = s.el.querySelector((ad ? '.ad0' : '.ad1') + ' iframe');
-    if ((!nf || !nf._ready) && waited < 6000) { s.timers.push(setTimeout(() => go(waited + 500), 500)); return; }
+    if (!flickWarm(nf, 2500) && waited < 6000) { s.timers.push(setTimeout(() => go(waited + 500), 500)); return; }
     storyGo(s, ad ? 0 : 1);
   };
   s.timers.push(setTimeout(() => go(0), STORY_MS[ad ? 1 : 0]));
@@ -1651,7 +1664,7 @@ function mountLazy(s) {
     f.setAttribute('allow', 'autoplay; fullscreen; encrypted-media; picture-in-picture'); f.setAttribute('allowfullscreen', ''); f.setAttribute('scrolling', 'no');
     f.title = 'Flam Flicks'; f.dataset.autoplay = '1'; f.dataset.flick = id;
     f.style.cssText = 'display:block;width:100%;height:100%;border:0;background:transparent';
-    f.addEventListener('load', () => { f._ready = (f.getAttribute('src') || '').indexOf('about:') !== 0; });
+    f.addEventListener('load', () => { f._ready = (f.getAttribute('src') || '').indexOf('about:') !== 0; if (f._ready) f._readyAt = Date.now(); });
     f.src = FLICK_SRC(id);
     fe.appendChild(f); ph.appendChild(fe);
   });
