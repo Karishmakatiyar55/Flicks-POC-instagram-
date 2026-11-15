@@ -511,11 +511,14 @@ a.ig-cta{text-decoration:none}
 /* phone view: a small draggable "Formats" button; a tap opens the three formats, a tap on one goes straight to it */
 .fmjump{display:none;position:fixed;z-index:9300;left:0;top:0;font-family:var(--f-page);color:#fff;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
 @media (max-width:760px){.fmjump{display:block}}
-.fmj-pill{display:flex;align-items:center;gap:6px;height:34px;padding:0 12px 0 10px;border-radius:17px;background:rgba(18,13,11,.78);border:1px solid rgba(255,255,255,.22);box-shadow:0 6px 20px rgba(0,0,0,.45);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);font-size:12.5px;font-weight:600;color:#fff;cursor:grab}
+.fmj-pill{position:relative;display:flex;align-items:center;gap:6px;height:34px;padding:0 12px 0 10px;border-radius:17px;background:rgb(24,18,16);border:1px solid rgba(255,255,255,.22);box-shadow:0 6px 20px rgba(0,0,0,.45);font-size:12.5px;font-weight:600;color:#fff;cursor:grab}
 .fmj-pill i[data-ic]{width:15px;height:15px}
 .fmj-panel{display:none;width:226px;border-radius:16px;background:rgba(18,13,11,.9);border:1px solid rgba(255,255,255,.2);box-shadow:0 10px 30px rgba(0,0,0,.55);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);overflow:hidden}
-.fmjump.hint .fmj-pill{border-color:var(--accent);animation:fmjPulse 1.3s cubic-bezier(.2,.7,.2,1) 4}
-@keyframes fmjPulse{0%{box-shadow:0 6px 20px rgba(0,0,0,.45),0 0 0 0 rgba(237,180,158,.75);transform:scale(1)}35%{transform:scale(1.07)}70%{box-shadow:0 6px 20px rgba(0,0,0,.45),0 0 0 14px rgba(237,180,158,0)}100%{box-shadow:0 6px 20px rgba(0,0,0,.45),0 0 0 0 rgba(237,180,158,0);transform:scale(1)}}
+/* highlight: the button itself stays still and solid; only a thin outline ring grows and fades around it
+   (no blur, no animated shadow or scale on the button, which some phones paint as a pale box behind it) */
+.fmjump.fmj-glow .fmj-pill{border-color:var(--accent)}
+.fmjump.fmj-glow .fmj-pill::after{content:"";position:absolute;inset:-1px;border-radius:inherit;border:2px solid var(--accent);background:none;opacity:0;pointer-events:none;animation:fmjRing 1.3s ease-out 4}
+@keyframes fmjRing{0%{opacity:.95;transform:scale(1)}100%{opacity:0;transform:scale(1.28,1.75)}}
 .fmjump.open .fmj-pill{display:none}
 .fmjump.open .fmj-panel{display:block}
 .fmj-top{display:flex;align-items:center;justify-content:space-between;padding:9px 8px 7px 13px;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.7);cursor:grab}
@@ -1796,15 +1799,15 @@ function fjOpen(on) {
 // a few seconds after a format opens (and on the last reel), the button pulses so people see where to change format
 let fjHintT = null, fjHintOff = null;
 function fjHint(wait) {
-  clearTimeout(fjHintT); clearTimeout(fjHintOff); fj.classList.remove('hint');
+  clearTimeout(fjHintT); clearTimeout(fjHintOff); fj.classList.remove('fmj-glow');
   fjHintT = setTimeout(() => {
     if (fj.classList.contains('open')) return;
-    void fj.offsetWidth; fj.classList.add('hint');
-    fjHintOff = setTimeout(() => fj.classList.remove('hint'), 5400);
+    void fj.offsetWidth; fj.classList.add('fmj-glow');
+    fjHintOff = setTimeout(() => fj.classList.remove('fmj-glow'), 5400);
   }, wait == null ? 3500 : wait);
 }
 fj.addEventListener('pointerdown', e => {
-  fj.classList.remove('hint'); clearTimeout(fjHintT);
+  fj.classList.remove('fmj-glow'); clearTimeout(fjHintT);
   fjDrag = { id: e.pointerId, x: e.clientX, y: e.clientY, px: fjPos ? fjPos.x : 0, py: fjPos ? fjPos.y : 0, moved: false };
   try { fj.setPointerCapture(e.pointerId); } catch (x) {}
 });
