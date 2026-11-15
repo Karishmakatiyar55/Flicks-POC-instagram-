@@ -314,7 +314,9 @@ main{position:relative;z-index:1}
 .st-row .av{width:32px;height:32px;font-size:13px;border:1.5px solid rgba(255,255,255,.7)}
 .st-row b{font-weight:600}
 .st-row span{opacity:.75}
-.st-row .x{margin-left:auto;display:flex;gap:14px}
+.st-row .x{margin-left:auto;display:flex;gap:14px;align-items:center}
+.st-x{pointer-events:auto;position:relative;width:24px;height:24px;color:#fff;cursor:pointer}
+.st-x::after{content:"";position:absolute;inset:-12px}   /* generous tap area */
 .fmt[data-state="s1"] .st-row.r0,.fmt[data-state="s2"] .st-row.r1,.fmt[data-state="ad"]:not([data-ad="1"]) .st-row.r2,.fmt[data-state="ad"][data-ad="1"] .st-row.r3,.st-row.always{display:flex}
 .st-reply{position:absolute;left:12px;right:12px;bottom:22px;display:flex;align-items:center;gap:14px}
 .st-reply .in{flex:1;height:44px;border-radius:22px;border:1px solid rgba(255,255,255,.55);display:flex;align-items:center;padding:0 18px;font-size:14px;color:rgba(255,255,255,.85)}
@@ -528,6 +530,15 @@ a.ig-cta{text-decoration:none}
 .rl-hint{display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px 0 7px;border-radius:11px;background:rgba(0,0,0,.5);font-size:11.5px;font-weight:600;text-shadow:none;white-space:nowrap}
 .rl-hint i[data-ic]{width:13px;height:13px}
 .rl-head{justify-content:center!important;gap:18px;font-size:19px!important;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+
+/* phone view: each reel's Flick fills the full width of the screen, edge to edge, with no black bars at the sides.
+   It keeps its 9:16 shape and sits on the glass field at the bottom; whatever does not fit is cropped off the TOP only,
+   so the variants and buttons along the bottom are always whole. The Reels UI box follows the same frame. */
+@media (max-width:760px){
+  .fmt[data-kind="reels"] .media iframe.cfr{flex:none;width:100cqw!important;height:calc(100cqw * 16 / 9)!important}
+  .fmt[data-kind="reels"] .media .mi[data-reel] flam-embed{width:100cqw!important}
+  .rl-frame{width:100cqw;height:calc(100cqw * 16 / 9)}
+}
 
 /* phone view: a small draggable "Formats" button; a tap opens the three formats, a tap on one goes straight to it */
 .fmjump{display:none;position:fixed;z-index:9300;left:0;top:0;font-family:var(--f-page);color:#fff;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
@@ -881,8 +892,8 @@ html.room::-webkit-scrollbar,html.room body::-webkit-scrollbar{display:none}
     </div>
     <div class="st-top">
       <div class="bars"><span><i data-bar></i></span><span><i data-bar></i></span></div>
-      <div class="st-row r2"><span class="av" data-av="gucci_logo" style="background:#000 var(--g) center/cover;color:transparent">G</span><b>gucci</b><span>Sponsored</span><span class="x"><i data-ic="more"></i><i data-ic="x"></i></span></div>
-      <div class="st-row r3"><span class="av" style="background:#6b2c45">N</span><b>necklace.swap</b><span>Sponsored</span><span class="x"><i data-ic="more"></i><i data-ic="x"></i></span></div>
+      <div class="st-row r2"><span class="av" data-av="gucci_logo" style="background:#000 var(--g) center/cover;color:transparent">G</span><b>gucci</b><span>Sponsored</span><span class="x"><i data-ic="more"></i><button type="button" class="st-x" data-story-close aria-label="Close story"><i data-ic="x"></i></button></span></div>
+      <div class="st-row r3"><span class="av" style="background:#6b2c45">N</span><b>necklace.swap</b><span>Sponsored</span><span class="x"><i data-ic="more"></i><button type="button" class="st-x" data-story-close aria-label="Close story"><i data-ic="x"></i></button></span></div>
     </div>
     <div class="media" data-media style="--tint:#0d1f17"><div class="mi">
       <div class="ad0">
@@ -1287,7 +1298,7 @@ function setState(s, st) {
   if (s.kind === 'story') {
     const n = st === 's1' ? 2 : st === 's2' ? 3 : (s.adIdx || 0);
     s.track.style.transform = 'translateX(-' + n * 100 + '%)';
-    if (st !== 'play') runBars(s, n, n <= 1 ? STORY_AD_MS : 3000);
+    if (st !== 'play') runBars(s, n, n <= 1 ? STORY_MS[n] : 3000);
     if (st === 'ad') storyNext(s);
     if (st === 'home') s.timers.push(setTimeout(() => { if (s.state === 'home') openStory(s); }, 2000));   // nobody tapped: the demo taps the Gucci story
     if (st === 's1') s.timers.push(setTimeout(() => { if (s.state === 's1') setState(s, 's2'); }, 3000));
@@ -1303,10 +1314,10 @@ function setState(s, st) {
 // Instagram story ads: each Flick story runs like any story. Its timeline always runs out and the next story
 // follows; a tap on the story outside the Flick moves on (left third: back), the way Instagram stories work.
 // Taps inside the Flick stay with the Flick (that is where the variants are).
-const STORY_AD_MS = 15000;
+const STORY_MS = [7000, 15000];   // how long each Flick story stays up: Gucci, then Necklace Swap
 function storyNext(s) {
   const ad = s.adIdx;
-  s.timers.push(setTimeout(() => { if (s.state === 'ad' && s.adIdx === ad) storyGo(s, ad ? 0 : 1); }, STORY_AD_MS));   // two Flick stories, round and round
+  s.timers.push(setTimeout(() => { if (s.state === 'ad' && s.adIdx === ad) storyGo(s, ad ? 0 : 1); }, STORY_MS[ad ? 1 : 0]));   // two Flick stories, round and round
 }
 function storyGo(s, n) {
   n = n > 1 ? 0 : Math.max(0, n);
@@ -1542,6 +1553,7 @@ function closeLink(s) {
 
 secs.forEach(s => {
   if (s.kind === 'story') s.el.querySelector('[data-open-story]')?.addEventListener('click', e => { e.stopPropagation(); openStory(s); });
+  if (s.kind === 'story') s.el.querySelectorAll('[data-story-close]').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); userShow(1); }));   // the story's X closes it and lands on the Instagram feed
   if (s.kind === 'story') s.screen.addEventListener('click', e => {
     if (s.state !== 'ad' || e.target.closest('iframe, button, a, input')) return;
     const r = s.screen.getBoundingClientRect(), left = (e.clientX - r.left) < r.width / 3;
