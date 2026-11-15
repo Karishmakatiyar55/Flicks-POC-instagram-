@@ -514,6 +514,8 @@ a.ig-cta{text-decoration:none}
 .fmj-pill{display:flex;align-items:center;gap:6px;height:34px;padding:0 12px 0 10px;border-radius:17px;background:rgba(18,13,11,.78);border:1px solid rgba(255,255,255,.22);box-shadow:0 6px 20px rgba(0,0,0,.45);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);font-size:12.5px;font-weight:600;color:#fff;cursor:grab}
 .fmj-pill i[data-ic]{width:15px;height:15px}
 .fmj-panel{display:none;width:226px;border-radius:16px;background:rgba(18,13,11,.9);border:1px solid rgba(255,255,255,.2);box-shadow:0 10px 30px rgba(0,0,0,.55);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);overflow:hidden}
+.fmjump.hint .fmj-pill{border-color:var(--accent);animation:fmjPulse 1.3s cubic-bezier(.2,.7,.2,1) 4}
+@keyframes fmjPulse{0%{box-shadow:0 6px 20px rgba(0,0,0,.45),0 0 0 0 rgba(237,180,158,.75);transform:scale(1)}35%{transform:scale(1.07)}70%{box-shadow:0 6px 20px rgba(0,0,0,.45),0 0 0 14px rgba(237,180,158,0)}100%{box-shadow:0 6px 20px rgba(0,0,0,.45),0 0 0 0 rgba(237,180,158,0);transform:scale(1)}}
 .fmjump.open .fmj-pill{display:none}
 .fmjump.open .fmj-panel{display:block}
 .fmj-top{display:flex;align-items:center;justify-content:space-between;padding:9px 8px 7px 13px;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.7);cursor:grab}
@@ -1304,6 +1306,7 @@ function reelGo(s, n) {
   s.engaged = false; s.el.classList.remove('eng'); applyAudio(s, false);
   if (was && old) old.querySelectorAll('iframe').forEach(reloadFrame);   // sound was on in the reel just left: restart it silent
   paintNav();
+  if (!hasNext()) fjHint(1500);   // last reel: nothing more to scroll to, so point at the Formats button
   return true;
 }
 // Messenger: send the chosen variant back to the seller
@@ -1725,9 +1728,15 @@ function cueOn() { return !navd || Date.now() - cueLast > 20000; }
 // A phone fling and a trackpad keep scrolling on their own for a second or two after the finger lifts. After a
 // format change, nothing moves again until that scrolling has died down, so one swipe never skips formats.
 function holdWhileMoving() { const now = Date.now(); if (now < navLock) navLock = Math.max(navLock, now + 380); }
-function gestureShow(i) { if (Date.now() < navLock) { holdWhileMoving(); return; } stepBy(i > mIdx ? 1 : -1); }
+// Scroll, swipe and drag gestures work inside Reels only: they move from reel to reel and never change the format.
+// Formats are changed from the Formats button (phone) or the list beside the phone (laptop).
+function gestureShow(i) {
+  if (Date.now() < navLock) { holdWhileMoving(); return; }
+  const s = secs[mIdx];
+  if (s && s.kind === 'reels' && s === current && reelGo(s, s.reelIdx + (i > mIdx ? 1 : -1))) { markNav(); roomDrag(0, true); }
+}
 function markNav() { navd = true; cueLast = Date.now(); navLock = Date.now() + 750; wLock = Math.max(wLock, Date.now() + 750); document.querySelectorAll('.fmt.peek').forEach(x => x.classList.remove('peek')); }
-function userShow(i) { markNav(); mShow(i); roomDrag(0, true); }
+function userShow(i) { markNav(); mShow(i); roomDrag(0, true); fjHint(); }
 // one step down or up: inside Reels it moves between the reels first, and changes format only past the first or last reel
 function stepBy(dir) {
   const s = secs[mIdx];
@@ -1757,6 +1766,7 @@ let roomT = null;
 addEventListener('scroll', () => {
   const d = scrollY - ROOM;
   clearTimeout(roomT); holdWhileMoving();
+  if (!(current && current.kind === 'reels')) { roomT = setTimeout(roomHome, 90); return; }   // outside Reels a scroll does nothing
   if (Date.now() < navLock) { roomT = setTimeout(() => { roomHome(); roomDrag(0, true); }, 90); return; }
   roomDrag(d, false);
   if (Math.abs(d) >= 70) { gestureShow(mIdx + (d > 0 ? 1 : -1)); roomT = setTimeout(roomHome, 90); return; }
@@ -1783,7 +1793,18 @@ function fjOpen(on) {
   fj.querySelectorAll('[data-jump]').forEach(b => b.classList.toggle('on', +b.dataset.jump === mIdx));
   fjPlace(right - fj.offsetWidth, fjPos ? fjPos.y : 112);
 }
+// a few seconds after a format opens (and on the last reel), the button pulses so people see where to change format
+let fjHintT = null, fjHintOff = null;
+function fjHint(wait) {
+  clearTimeout(fjHintT); clearTimeout(fjHintOff); fj.classList.remove('hint');
+  fjHintT = setTimeout(() => {
+    if (fj.classList.contains('open')) return;
+    void fj.offsetWidth; fj.classList.add('hint');
+    fjHintOff = setTimeout(() => fj.classList.remove('hint'), 5400);
+  }, wait == null ? 3500 : wait);
+}
 fj.addEventListener('pointerdown', e => {
+  fj.classList.remove('hint'); clearTimeout(fjHintT);
   fjDrag = { id: e.pointerId, x: e.clientX, y: e.clientY, px: fjPos ? fjPos.x : 0, py: fjPos ? fjPos.y : 0, moved: false };
   try { fj.setPointerCapture(e.pointerId); } catch (x) {}
 });
@@ -1821,7 +1842,7 @@ function fit() {
   document.documentElement.style.setProperty('--s', k.toFixed(4));
 }
 fit(); addEventListener('resize', fit); mq.addEventListener?.('change', () => { fit(); modeChange(); });
-mShow(0); fjFit();
+mShow(0); fjFit(); fjHint();
 
 const loop = () => { secs.forEach(s => { if (s.near) follow(s); }); requestAnimationFrame(loop); };
 requestAnimationFrame(loop);
