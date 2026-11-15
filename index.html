@@ -789,12 +789,14 @@ html.room::-webkit-scrollbar,html.room body::-webkit-scrollbar{display:none}
 .ig-home .ig-stories{padding-top:28px;margin-top:-20px;padding-left:16px}
 @keyframes igPulse{0%{transform:scale(1);box-shadow:0 0 0 0 rgba(250,126,30,.8)}45%{transform:scale(1.08)}70%{box-shadow:0 0 0 14px rgba(250,126,30,0)}100%{transform:scale(1);box-shadow:0 0 0 0 rgba(250,126,30,0)}}
 .fmt[data-state="splash"] .st-top,.fmt[data-state="home"] .st-top,.fmt[data-state="splash"] .media,.fmt[data-state="home"] .media{opacity:0}
-#f2[data-state="ad"] .media .mi{pointer-events:auto;height:100%;width:100%;box-sizing:border-box;padding:calc(var(--sbh) + 52px) 0 14px;display:flex;align-items:center;justify-content:center;container-type:size}
-#f2[data-state="ad"] .media .mi :is(.ad0,.ad1,.flick-lazy){display:contents}
-#f2[data-state="ad"] .media .mi flam-embed{flex:none;width:min(100cqw, calc(100cqh * 9 / 16))!important}
-/* both story Flicks stay loaded while the stories play: the one that is not on screen sits underneath, invisible and
-   untappable, so it is already playing when its turn comes instead of showing its blank page while it loads */
-#f2[data-ad="1"][data-state="ad"] .ad0 flam-embed,#f2:not([data-ad="1"])[data-state="ad"] .ad1 flam-embed{position:absolute!important;opacity:0!important;pointer-events:none!important}
+/* Both story Flicks load as soon as the page opens, stacked in the same spot at their final size, and stay loaded while the
+   stories play. A Flick's page is blank white for several seconds while it loads, so each one needs that head start; the
+   one that is not on screen is invisible and untappable underneath. */
+#f2:is([data-state="splash"],[data-state="home"],[data-state="ad"]) .media .mi{height:100%;width:100%;box-sizing:border-box;padding:calc(var(--sbh) + 52px) 0 14px;display:grid;place-items:center;container-type:size}
+#f2[data-state="ad"] .media .mi{pointer-events:auto}
+#f2:is([data-state="splash"],[data-state="home"],[data-state="ad"]) .media .mi :is(.ad0,.ad1,.flick-lazy){display:contents}
+#f2:is([data-state="splash"],[data-state="home"],[data-state="ad"]) .media .mi flam-embed{grid-area:1/1;width:min(100cqw, calc(100cqh * 9 / 16))!important}
+#f2[data-ad="1"] .ad0 flam-embed,#f2:not([data-ad="1"]) .ad1 flam-embed{opacity:0!important;pointer-events:none!important}
 
 
 /* closing */
@@ -1324,15 +1326,23 @@ function setState(s, st) {
 const STORY_MS = [7000, 15000];   // how long each Flick story stays up: Gucci, then Necklace Swap
 function storyNext(s) {
   const ad = s.adIdx;
-  s.timers.push(setTimeout(() => { if (s.state === 'ad' && s.adIdx === ad) storyGo(s, ad ? 0 : 1); }, STORY_MS[ad ? 1 : 0]));   // two Flick stories, round and round
+  // two Flick stories, round and round. If the next story's Flick has not finished loading yet, hold the current one a
+  // little longer (up to 6 s) instead of cutting to a blank page.
+  const go = waited => {
+    if (s.state !== 'ad' || s.adIdx !== ad) return;
+    const nf = s.el.querySelector((ad ? '.ad0' : '.ad1') + ' iframe');
+    if ((!nf || !nf._ready) && waited < 6000) { s.timers.push(setTimeout(() => go(waited + 500), 500)); return; }
+    storyGo(s, ad ? 0 : 1);
+  };
+  s.timers.push(setTimeout(() => go(0), STORY_MS[ad ? 1 : 0]));
 }
 function storyGo(s, n) {
   n = n > 1 ? 0 : Math.max(0, n);
   stopTimers(s);
-  // the Flick that was on goes quiet and restarts out of sight; the one coming on is left alone, already loaded
-  const leaving = s.el.querySelector(s.adIdx ? '.ad1' : '.ad0'), a = document.activeElement;
+  // the Flick that was on goes quiet; the one coming on is left alone, already loaded and playing
+  const was = s.engaged, leaving = s.el.querySelector(s.adIdx ? '.ad1' : '.ad0'), a = document.activeElement;
   s.engaged = false; s.el.classList.remove('eng'); applyAudio(s, false);
-  if (n !== s.adIdx && leaving) leaving.querySelectorAll('iframe').forEach(reloadFrame);
+  if (was && n !== s.adIdx && leaving) leaving.querySelectorAll('iframe').forEach(f => { f._ready = false; reloadFrame(f); });   // sound was on: restart it so it cannot carry on unseen
   if (a && a !== document.body && s.media.contains(a)) { try { a.blur(); } catch (e) {} try { window.focus(); } catch (e) {} }
   s.adIdx = n; s.el.dataset.ad = String(n); setState(s, 'ad');
 }
@@ -1632,7 +1642,7 @@ setInterval(() => { const s = secs[mIdx]; if (s) mountLazy(s); }, 150);
 function mountLazy(s) {
   s.el.querySelectorAll('.flick-lazy').forEach(ph => {
     const id = ph.dataset.fid;
-    const on = ph.querySelector('flam-embed'), shown = lazyShown(ph, s) && !(s.kind === 'story' && s.state !== 'ad' && s.state !== 'home');   // story Flicks start loading on the home screen, so the Gucci story is ready when tapped   // story Flicks unload once the photo stories start
+    const on = ph.querySelector('flam-embed'), shown = lazyShown(ph, s) && !(s.kind === 'story' && s.state !== 'ad' && s.state !== 'home' && s.state !== 'splash');   // story Flicks start loading with the launch screen, so both are ready when their story comes on
     if (on && !shown) { const f = on.querySelector('iframe'); try { if (f) f.src = 'about:blank'; } catch (x) {} on.remove(); return; }   // hidden again (story moved to its next ad): unload, so nothing plays unseen
     if (on || !shown) return;
     document.querySelectorAll('.flick-lazy flam-embed[data-fid="' + id + '"]').forEach(el => el.remove());   // one live copy per Flick
@@ -1640,12 +1650,8 @@ function mountLazy(s) {
     const f = document.createElement('iframe');
     f.setAttribute('allow', 'autoplay; fullscreen; encrypted-media; picture-in-picture'); f.setAttribute('allowfullscreen', ''); f.setAttribute('scrolling', 'no');
     f.title = 'Flam Flicks'; f.dataset.autoplay = '1'; f.dataset.flick = id;
-    f.style.cssText = 'display:block;width:100%;height:100%;border:0;background:transparent;opacity:0;transition:opacity .3s ease';
-    // a Flick's page is blank white until its video is ready: keep the frame invisible until it has loaded, then fade it in
-    let shownT = null;
-    const reveal = ms => { clearTimeout(shownT); shownT = setTimeout(() => { f.style.opacity = '1'; }, ms); };
-    f.addEventListener('load', () => { if ((f.getAttribute('src') || '').indexOf('about:') === 0) { clearTimeout(shownT); f.style.opacity = '0'; return; } reveal(900); });
-    reveal(9000);   // never leave it hidden for good
+    f.style.cssText = 'display:block;width:100%;height:100%;border:0;background:transparent';
+    f.addEventListener('load', () => { f._ready = (f.getAttribute('src') || '').indexOf('about:') !== 0; });
     f.src = FLICK_SRC(id);
     fe.appendChild(f); ph.appendChild(fe);
   });
