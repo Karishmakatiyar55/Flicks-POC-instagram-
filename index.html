@@ -13,7 +13,7 @@
 <style>
 /* Layout: desktop = narrative column + iPhone (402x874pt) scaled to viewport; mobile = each journey is one full-screen snap page, ad only */
 :root{
-  --tbh:78px;
+  --tbh:86px;
   --bg:#120D0B; --panel:rgba(255,232,220,.03); --fg:#F4E7E0; --mute:rgba(244,231,224,.66); --dim:rgba(244,231,224,.42); --line:rgba(255,226,210,.11);
   --accent:#EDB49E; --link:#A9C1FF; --cf:#D2B2F2; --warn:#F2C08A;
   --peach:linear-gradient(100deg,#F7E9E2 0%,#F0CBBB 50%,#E3A895 100%);
@@ -279,8 +279,17 @@ main{position:relative;z-index:1}
 .ig-cap{padding:0 12px 14px;font-size:13.5px;line-height:1.4}
 .ig-cap b{font-weight:600}
 .ig-cap small{display:block;color:#A8A8A8;margin-top:4px;font-size:12.5px}
-.ig-tabs{background:#000;border-top:1px solid #1f1f1f;color:#f5f5f5}
-.ig-tabs .me{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#d4a373,#6b4226)}
+.me{display:block;width:27px;height:27px;border-radius:50%;background:linear-gradient(135deg,#d4a373,#6b4226)}
+/* Instagram's bottom bar: a floating glass pill (home, reels, messages, search, profile) over the bottom of the screen.
+   Home and Reels are live: Home opens the feed (the post format), Reels opens the reels. The others are for show. */
+.ig-tabs{position:absolute;left:0;right:0;bottom:0;z-index:24;height:var(--tbh);box-sizing:border-box;padding:10px 22px 18px;pointer-events:none}
+.ig-tabs::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,.62))}
+.igt-pill{pointer-events:auto;height:100%;border-radius:999px;display:flex;align-items:center;gap:2px;padding:0 7px;box-sizing:border-box;color:#fff;background:rgba(46,46,50,.5);border:1px solid rgba(255,255,255,.17);box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 10px 28px rgba(0,0,0,.45);-webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%)}
+.igt-pill > *{flex:1;height:calc(100% - 14px);border-radius:999px;display:flex;align-items:center;justify-content:center;position:relative;color:#fff}
+.igt-pill > button{cursor:pointer}
+.igt-pill > .on{background:rgba(255,255,255,.22)}
+.igt-pill i[data-ic]{width:26px;height:26px}
+.igt-pill em{position:absolute;left:calc(50% + 1px);top:calc(50% - 1px);min-width:17px;height:17px;padding:0 4px;box-sizing:border-box;border-radius:9px;background:#ff3040;color:#fff;font:700 10.5px/17px var(--f-ui);font-style:normal;text-align:center}
 
 /* ── Stories ── */
 .story{background:#000;color:#fff}
@@ -347,7 +356,6 @@ main{position:relative;z-index:1}
 .fmt.eng .cfo{opacity:0}
 .cf-tag{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;height:24px;padding:0 9px;border-radius:7px;background:rgba(255,255,255,.18);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);font-size:12px;font-weight:600}
 .cf-tag i[data-ic]{width:13px;height:13px}
-.reels .tabbar{position:absolute;left:0;right:0;bottom:0;z-index:6;background:#000;border-top:1px solid #1a1a1a}
 .prof{position:absolute;inset:0;z-index:10;background:#000;color:#f5f5f5;display:flex;flex-direction:column;transform:translateX(102%);transition:transform .5s cubic-bezier(.2,.8,.2,1)}
 .fmt[data-state="profile"] .prof,.fmt[data-state="tap"] .prof,.fmt[data-state="iab"] .prof{transform:none}
 .prof-bar{flex:none;height:46px;display:flex;align-items:center;gap:10px;padding:0 14px;font-size:18px;font-weight:700}
@@ -463,7 +471,7 @@ main{position:relative;z-index:1}
 
 /* Flicks in Post: the sponsored post is on screen from the start and the Nike Flick is the post's own media */
 .pf-feed{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden}
-.pf-post{flex:0 1 auto;min-height:0;display:flex;flex-direction:column}
+.pf-post{flex:0 1 auto;min-height:0;display:flex;flex-direction:column}   /* the feed runs on under the glass bottom bar, as it does in Instagram */
 .pf-post > *{flex:none}
 .pf-post > .pf-slot{flex:0 1 auto;min-height:0;aspect-ratio:1/1;background:#000}
 .pf-next{flex:1 1 0;min-height:0;overflow:hidden;border-top:1px solid #1f1f1f}
@@ -491,6 +499,7 @@ a.ig-cta{text-decoration:none}
    The rail is Instagram's own set (like, comment, repost, share, save, more) in Instagram's own place, the same on
    every reel. It stops just above each Flick's mute button. On the Necklace reel the Flick's variants run down the
    right side, so the rail sits over their right edge there; taps still pass through to the variants. */
+.rl-glass{position:absolute;left:0;right:0;bottom:0;height:calc(var(--tbh) + var(--rl-band) + 10px);z-index:21;pointer-events:none;background:linear-gradient(180deg,rgba(30,30,33,0) 0,rgba(30,30,33,.88) 10px,rgba(16,16,18,.97) 100%);-webkit-backdrop-filter:blur(16px) saturate(150%);backdrop-filter:blur(16px) saturate(150%)}
 .rl-ov{z-index:25;pointer-events:none;text-shadow:0 1px 3px rgba(0,0,0,.6)}
 .rl-box{position:absolute;left:0;right:0;top:var(--sbh);bottom:var(--tbh);box-sizing:border-box;padding-bottom:var(--rl-band);container-type:size;display:flex;align-items:flex-end;justify-content:center}
 .rl-frame{position:relative;flex:none;width:min(100cqw, calc(100cqh * 9 / 16));height:min(100cqh, calc(100cqw * 16 / 9))}
@@ -574,7 +583,7 @@ html.room::-webkit-scrollbar,html.room body::-webkit-scrollbar{display:none}
 @keyframes scWheel{0%{transform:translateY(0);opacity:0}20%{opacity:1}70%{transform:translateY(9px);opacity:0}100%{opacity:0}}
 .sc-word{font:600 10px/1 var(--f-page,inherit);letter-spacing:.24em;text-transform:uppercase;writing-mode:vertical-rl;color:rgba(244,231,224,.55)}
 @media (max-width:760px){
-  .scroll-cue{left:50%!important;top:auto!important;bottom:calc(env(safe-area-inset-bottom,0px) + 26px);transform:translateX(-50%);color:#fff}
+  .scroll-cue{left:10px!important;top:50%!important;bottom:auto;transform:translateY(-50%);color:#fff}   /* left edge, mid-height: clear of the bottom bar and of the Flicks' own buttons */
   .scroll-cue .sc-mouse,.scroll-cue .sc-word{display:none}
   .scroll-cue .sc-phone{display:block;position:relative;width:38px;height:62px;border-radius:19px;background:rgba(12,9,8,.42);box-shadow:0 0 0 .5px rgba(255,255,255,.22),0 8px 24px rgba(0,0,0,.35);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
   .sc-track{position:absolute;left:50%;top:14px;bottom:14px;width:2px;margin-left:-1px;border-radius:1px;background:linear-gradient(to top,rgba(255,255,255,0),rgba(255,255,255,.35))}
@@ -740,7 +749,6 @@ html.room::-webkit-scrollbar,html.room body::-webkit-scrollbar{display:none}
 .ig-home{overflow:hidden}
 .ig-home .ig-head{position:relative;z-index:0}
 .ig-home .igh-body{position:relative;z-index:1}
-.ig-home .ig-tabs{position:relative;z-index:2}
 .ig-home .ig-stories span b.brand{background:conic-gradient(from 210deg,#FEDA75,#FA7E1E,#D62976,#962FBF,#4F5BD5,#FEDA75);position:relative}
 .ig-home .ig-stories span b.brand::after{background:#000 var(--g) center/cover}
 .ig-home .ig-stories span b.brand em{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:700 24px/1 var(--f-page,inherit);font-style:normal;color:#f3e3c3;z-index:1}
@@ -791,7 +799,8 @@ html.room::-webkit-scrollbar,html.room body::-webkit-scrollbar{display:none}
 
 /* ───────── phone: the page IS the phone. Ad only, no copy. ───────── */
 @media (max-width:760px){
-  :root{--sbh:0px;--tbh:0px;--mh:calc(60px + env(safe-area-inset-top,0px))}
+  :root{--sbh:0px;--tbh:68px;--mh:calc(60px + env(safe-area-inset-top,0px))}
+  .ig-tabs{padding:6px 14px 10px}
   .tabbar,.iab-nav{display:none!important}
   html,body{height:100%;overflow:hidden;overscroll-behavior:none}
   .nav,.hero,.lane,.copy,.closing,.sb,.island{display:none!important}
@@ -892,7 +901,7 @@ html.room::-webkit-scrollbar,html.room body::-webkit-scrollbar{display:none}
             <div class="ph" data-img="goa" style="aspect-ratio:1/1;background:#e07a5f"></div>
           </article>
         </div>
-        <nav class="tabbar ig-tabs"><i data-ic="home"></i><i data-ic="search"></i><i data-ic="plusbox"></i><i data-ic="reels"></i><span class="me"></span></nav>
+        <nav class="ig-tabs" aria-label="Instagram"><div class="igt-pill"><button type="button" data-nav="home" class="on" aria-label="Home"><i data-ic="homeOn"></i></button><button type="button" data-nav="reels" aria-label="Reels"><i data-ic="reelNav"></i></button><span><i data-ic="send"></i><em>13</em></span><span><i data-ic="search"></i></span><span><b class="me"></b></span></div></nav>
       </div>
     </div>
     <div class="island"></div>
@@ -930,7 +939,7 @@ html.room::-webkit-scrollbar,html.room body::-webkit-scrollbar{display:none}
         <div class="pf-blank"></div>
       </article>
     </div>
-    <nav class="tabbar ig-tabs"><i data-ic="home"></i><i data-ic="search"></i><i data-ic="plusbox"></i><i data-ic="reels"></i><span class="me"></span></nav>
+    <nav class="ig-tabs" aria-label="Instagram"><div class="igt-pill"><button type="button" data-nav="home" class="on" aria-label="Home"><i data-ic="homeOn"></i></button><button type="button" data-nav="reels" aria-label="Reels"><i data-ic="reelNav"></i></button><span><i data-ic="send"></i><em>13</em></span><span><i data-ic="search"></i></span><span><b class="me"></b></span></div></nav>
     <div class="media" data-media style="--tint:#000;background:#000"><div class="mi full">
       <iframe class="cfr" title="Nike ad" allow="fullscreen" allowtransparency="true" style="border:0;display:block;background:transparent;width:100%;height:100%" srcdoc="&lt;!doctype html&gt;
 &lt;meta charset=utf-8&gt;
@@ -1045,7 +1054,8 @@ addEventListener(&#x27;wheel&#x27;,function(e){parent.postMessage({type:&#x27;fl
       </div></div>
     </div>
     <div class="r-head rl-head" style="z-index:25"><span>Reels</span></div>
-    <nav class="tabbar ig-tabs" style="z-index:24"><i data-ic="home"></i><i data-ic="search"></i><i data-ic="plusbox"></i><i data-ic="reels"></i><span class="me"></span></nav>
+    <div class="rl-glass"></div>
+    <nav class="ig-tabs" aria-label="Instagram"><div class="igt-pill"><button type="button" data-nav="home" aria-label="Home"><i data-ic="home"></i></button><button type="button" data-nav="reels" class="on" aria-label="Reels"><i data-ic="reelNavOn"></i></button><span><i data-ic="send"></i><em>13</em></span><span><i data-ic="search"></i></span><span><b class="me"></b></span></div></nav>
     <div class="island"></div>
    </div>
   </div></div></div>
@@ -1111,6 +1121,9 @@ const P = {
   image:'<rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/>',
   coin:'<circle cx="12" cy="12" r="9" fill="currentColor" stroke="none"/><path d="M12 7v10M9.5 9.5h4a1.5 1.5 0 0 1 0 3h-3a1.5 1.5 0 0 0 0 3h4" stroke="#7a5200"/>',
   replay:'<path d="M4 12a8 8 0 1 0 2.3-5.7M4 4v4h4"/>',
+  homeOn:'<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" fill="currentColor"/>',
+  reelNav:'<rect x="3.5" y="3.5" width="17" height="17" rx="5"/><path d="M10.2 8.6v6.8l5.6-3.4z"/>',
+  reelNavOn:'<rect x="3.5" y="3.5" width="17" height="17" rx="5" fill="currentColor"/><path d="M10.2 8.6v6.8l5.6-3.4z" fill="#1c1c1e" stroke="#1c1c1e"/>',
   repost:'<path d="M17 2l4 4-4 4"/><path d="M3 11V10a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/>',
   lines:'<path d="M9 9h11M4 15h16"/>',
   user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4.5-6 8-6s7 2 8 6"/>',
@@ -1776,6 +1789,11 @@ addEventListener('scroll', () => {
   roomT = setTimeout(() => { roomHome(); roomDrag(0, true); }, 140);
 }, { passive: true });
 
+// Instagram's bottom bar: Home opens the feed (the post format), Reels opens the reels; the other icons do nothing
+document.addEventListener('click', e => {
+  const b = e.target.closest && e.target.closest('.ig-tabs [data-nav]'); if (!b) return;
+  userShow(b.dataset.nav === 'reels' ? 2 : 1);
+});
 // Phone view: a small draggable "Formats" button. A tap opens the list of formats; a tap on one shows it; "–" minimises it.
 const JUMP = [['Instagram Stories', 'Story ads you can swap'], ['Instagram Feed', 'A sponsored post you can swap'], ['Instagram Reels', 'Sponsored reels you can swap']];
 const fj = document.createElement('div'); fj.className = 'fmjump';

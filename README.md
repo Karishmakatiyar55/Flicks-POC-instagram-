@@ -6,7 +6,7 @@ Interactive proof of concept by Flam: Flicks (swappable, interactive videos) ins
 2. **Flicks in Post**: a sponsored post whose media is the Nike Flick, swappable inside the post. Shop now goes to nike.com
 3. **Flicks in Reels**: three sponsored reels, each one a Flick with a minimal Reels UI over it (Get Ready With Me, Puffer jacket swap, Necklace swap)
 
-On a laptop, pick a format from the list beside the phone (the arrow keys also work). On a phone, each format is full screen: tap the draggable Formats button and pick a format; the button pulses a few seconds after each format opens. Scroll and swipe work inside Reels only, to move from one reel to the next; they never change the format.
+On a laptop, pick a format from the list beside the phone (the arrow keys also work). On a phone, each format is full screen: tap the draggable Formats button and pick a format; the button pulses a few seconds after each format opens. Scroll and swipe work inside Reels only, to move from one reel to the next; they never change the format. Instagram's bottom bar is live too: Home opens the feed (the post), Reels opens the reels.
 
 ## Hosting on Vercel
 Import this repository in Vercel (Add New → Project), framework preset **Other**, no build command, root directory unchanged. Every push to `main` redeploys.
