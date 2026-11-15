@@ -475,8 +475,9 @@ a.ig-cta{text-decoration:none}
 /* Flicks in Reels: every reel is a sponsored Flick, full height. All three load together when Reels opens (the two
    that are not on screen sit underneath, invisible), so the next reel is already playing when it slides in. */
 .rl-slot{position:absolute;left:0;right:0;top:var(--sbh);bottom:var(--tbh)}
+.fmt[data-kind="reels"]{--rl-band:34px}   /* strip under the Flick for the profile row, at Instagram's bottom-left spot */
 .fmt[data-kind="reels"] .cf-track{transition:transform .5s cubic-bezier(.2,.8,.2,1)}
-.fmt[data-kind="reels"] .media .mi[data-reel]{position:absolute;inset:0}
+.fmt[data-kind="reels"] .media .mi[data-reel]{position:absolute;inset:0;box-sizing:border-box;padding-bottom:var(--rl-band);align-items:flex-end}
 .fmt[data-kind="reels"] .media .mi[data-reel]:not(.on){opacity:0;pointer-events:none!important}
 .fmt[data-kind="reels"] .media .mi[data-reel]::before{content:"";position:absolute;left:50%;top:50%;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;border:2.5px solid rgba(255,255,255,.16);border-top-color:rgba(255,255,255,.85);animation:rlSpin .8s linear infinite}
 @keyframes rlSpin{to{transform:rotate(360deg)}}
@@ -484,23 +485,25 @@ a.ig-cta{text-decoration:none}
 .fmt[data-kind="reels"] .media iframe.cfr{background:transparent}
 .fmt[data-kind="reels"] .media .mi[data-reel] .flick-lazy{display:contents}
 .fmt[data-kind="reels"] .media .mi[data-reel] flam-embed{position:relative;flex:none;width:min(100cqw, calc(100cqh * 9 / 16))!important}
-/* Reels UI over the Flick, kept minimal and placed clear of each Flick's own buttons. Everything is positioned
-   inside a box that matches the Flick's 9:16 frame, so it stays clear at every screen size.
-   GRWM and Puffer jacket: variants run along the bottom (from about 82% down), so the rail and the name stop at 79%.
-   Necklace: variants run down the right side (55% to 91%) and its logo is top-left, so the rail sits above them. */
+/* Reels UI, kept minimal and laid out the way Instagram does: the profile (name, Sponsored) at the bottom-left,
+   the action rail on the right. The Flicks keep their own swap buttons in the bottom 18% of the picture, exactly
+   where Instagram puts the profile, so the Flick sits just above a slim strip that holds the profile row.
+   The rail is positioned inside a box matching the Flick's 9:16 frame so it stays clear at every screen size:
+   GRWM and Puffer jacket have variants along the bottom (from about 82% down), so the rail stops at 79%;
+   Necklace has variants down the right side (55% to 91%) and its logo top-left, so the rail sits above them. */
 .rl-ov{z-index:25;pointer-events:none;text-shadow:0 1px 3px rgba(0,0,0,.6)}
-.rl-box{position:absolute;left:0;right:0;top:var(--sbh);bottom:var(--tbh);container-type:size;display:flex;align-items:center;justify-content:center}
+.rl-box{position:absolute;left:0;right:0;top:var(--sbh);bottom:var(--tbh);box-sizing:border-box;padding-bottom:var(--rl-band);container-type:size;display:flex;align-items:flex-end;justify-content:center}
 .rl-frame{position:relative;flex:none;width:min(100cqw, calc(100cqh * 9 / 16));height:min(100cqh, calc(100cqw * 16 / 9))}
 .rl-rail{position:absolute;right:8px;bottom:21%;display:flex;flex-direction:column;align-items:center;gap:14px;font-size:11.5px;font-weight:600;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))}
 .rl-rail span{display:flex;flex-direction:column;align-items:center;gap:3px}
 .rl-rail i[data-ic]{width:26px;height:26px}
 .rl-frame.side .rl-rail{bottom:48%}
-.rl-meta{position:absolute;left:12px;bottom:21%;max-width:60%;display:flex;flex-direction:column;align-items:flex-start;gap:7px}
-.rl-meta .who{display:flex;align-items:center;gap:8px}
-.rl-meta .av{width:28px;height:28px;font-size:12px;position:relative;overflow:hidden;text-shadow:none}
-.rl-meta .nm{display:flex;flex-direction:column;gap:1px;line-height:1.15}
-.rl-meta .nm b{font-size:13.5px;font-weight:600}
-.rl-meta .nm small{font-size:11.5px;font-weight:500}
+.rl-meta{position:absolute;left:12px;right:12px;bottom:3px;height:30px;display:flex;align-items:center;gap:10px}
+.rl-meta .who{display:flex;align-items:center;gap:8px;min-width:0}
+.rl-meta .av{width:28px;height:28px;font-size:12px;position:relative;overflow:hidden;text-shadow:none;flex:none}
+.rl-meta .nm{display:flex;flex-direction:column;gap:1px;line-height:1.1}
+.rl-meta .nm b{font-size:13px;font-weight:600}
+.rl-meta .nm small{font-size:11px;font-weight:500}
 .rl-hint{display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px 0 7px;border-radius:11px;background:rgba(0,0,0,.5);font-size:11.5px;font-weight:600;text-shadow:none;white-space:nowrap}
 .rl-hint i[data-ic]{width:13px;height:13px}
 .fmt[data-kind="reels"] .r-head span{transition:opacity .25s}
@@ -1014,25 +1017,28 @@ addEventListener(&#x27;wheel&#x27;,function(e){parent.postMessage({type:&#x27;fl
     <div class="cf-track rl-ov" data-rtrack>
       <div><div class="rl-box"><div class="rl-frame">
         <div class="rl-rail"><span><i data-ic="heart"></i>31.8K</span><span><i data-ic="comment"></i>418</span><span><i data-ic="send"></i>1.9K</span></div>
+      </div>
         <div class="rl-meta">
           <div class="who"><span class="av" data-img="ria" style="background:#7a3048"></span><span class="nm"><b>ria.wears</b><small>Sponsored</small></span></div>
           <span class="rl-hint"><i data-ic="tap"></i>Tap a dress to swap</span>
         </div>
-      </div></div></div>
+      </div></div>
       <div><div class="rl-box"><div class="rl-frame">
         <div class="rl-rail"><span><i data-ic="heart"></i>24.6K</span><span><i data-ic="comment"></i>302</span><span><i data-ic="send"></i>1.1K</span></div>
+      </div>
         <div class="rl-meta">
           <div class="who"><span class="av" style="background:#3a7d5c">K</span><span class="nm"><b>kiran.p</b><small>Sponsored</small></span></div>
           <span class="rl-hint"><i data-ic="tap"></i>Tap a jacket to swap</span>
         </div>
-      </div></div></div>
+      </div></div>
       <div><div class="rl-box"><div class="rl-frame side">
         <div class="rl-rail"><span><i data-ic="heart"></i>48.2K</span><span><i data-ic="comment"></i>612</span><span><i data-ic="send"></i>2.1K</span></div>
+      </div>
         <div class="rl-meta">
           <div class="who"><span class="av" style="background:linear-gradient(135deg,#ffd166,#ef476f)">A</span><span class="nm"><b>aisha_m</b><small>Sponsored</small></span></div>
           <span class="rl-hint"><i data-ic="tap"></i>Tap a necklace to swap</span>
         </div>
-      </div></div></div>
+      </div></div>
     </div>
     <div class="r-head" style="z-index:25"><span>Reels</span><i data-ic="camera"></i></div>
     <nav class="tabbar ig-tabs" style="z-index:24"><i data-ic="home"></i><i data-ic="search"></i><i data-ic="plusbox"></i><i data-ic="reels"></i><span class="me"></span></nav>
