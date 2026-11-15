@@ -8,6 +8,9 @@ Interactive proof of concept by Flam: Flicks (swappable, interactive videos) ins
 
 On a laptop, pick a format from the list beside the phone (the arrow keys also work). On a phone, each format is full screen: tap the draggable Formats button and pick a format; the button pulses a few seconds after each format opens. Scroll and swipe work inside Reels only, to move from one reel to the next; they never change the format. Instagram's bottom bar is live too: Home opens the feed (the post), Reels opens the reels.
 
+## Full screen on a phone
+On a phone browser the page no longer scrolls, so the address bar stays put while you swipe between reels. Android browsers go full screen on the first tap. iPhone browsers do not let a page go full screen: use Share → Add to Home Screen and open it from the icon, which runs it with no browser bars.
+
 ## Hosting on Vercel
 Import this repository in Vercel (Add New → Project), framework preset **Other**, no build command, root directory unchanged. Every push to `main` redeploys.
 

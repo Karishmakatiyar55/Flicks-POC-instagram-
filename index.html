@@ -2,8 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#000000">
+<!-- opened from the phone's home screen ("Add to Home Screen"), the prototype runs full screen with no browser bars -->
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Flicks × Instagram">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
 <title>Flicks on Instagram</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -500,6 +507,11 @@ a.ig-cta{text-decoration:none}
    every reel. It stops just above each Flick's mute button. On the Necklace reel the Flick's variants run down the
    right side, so the rail sits over their right edge there; taps still pass through to the variants. */
 .rl-glass{position:absolute;left:0;right:0;bottom:0;height:calc(var(--tbh) + var(--rl-band) + 10px);z-index:21;pointer-events:none;background:linear-gradient(180deg,rgba(30,30,33,0) 0,rgba(30,30,33,.88) 10px,rgba(16,16,18,.97) 100%);-webkit-backdrop-filter:blur(16px) saturate(150%);backdrop-filter:blur(16px) saturate(150%)}
+/* touch screens: swipe areas over the parts of each Flick that have no buttons. A swipe that starts here moves to the
+   next or previous reel; the Flick's own buttons (variants, mute, Add to bag) stay uncovered and tappable. */
+.rl-swipe{position:absolute;left:0;right:0;top:0;bottom:20%;pointer-events:none}
+.rl-swipe.side{right:27%;bottom:10%}
+@media (pointer:coarse){.rl-swipe{pointer-events:auto;touch-action:none}}
 .rl-ov{z-index:25;pointer-events:none;text-shadow:0 1px 3px rgba(0,0,0,.6)}
 .rl-box{position:absolute;left:0;right:0;top:var(--sbh);bottom:var(--tbh);box-sizing:border-box;padding-bottom:var(--rl-band);container-type:size;display:flex;align-items:flex-end;justify-content:center}
 .rl-frame{position:relative;flex:none;width:min(100cqw, calc(100cqh * 9 / 16));height:min(100cqh, calc(100cqw * 16 / 9))}
@@ -803,6 +815,7 @@ html.room::-webkit-scrollbar,html.room body::-webkit-scrollbar{display:none}
   .ig-tabs{padding:6px 14px 10px}
   .tabbar,.iab-nav{display:none!important}
   html,body{height:100%;overflow:hidden;overscroll-behavior:none}
+  body{position:fixed;left:0;top:0;right:0;bottom:0;width:100%;touch-action:none}
   .nav,.hero,.lane,.copy,.closing,.sb,.island{display:none!important}
   .mhead{display:flex!important}
   .fmt{position:fixed;left:0;right:0;top:var(--mh);bottom:0;min-height:0;height:auto;display:none;padding:0 0 env(safe-area-inset-bottom,0px)}
@@ -1029,6 +1042,7 @@ addEventListener(&#x27;wheel&#x27;,function(e){parent.postMessage({type:&#x27;fl
     <!-- Reels UI laid over each Flick, kept minimal: action rail, name with a Sponsored label, one hint. Taps pass through to the Flick. -->
     <div class="cf-track rl-ov" data-rtrack>
       <div><div class="rl-box"><div class="rl-frame">
+        <div class="rl-swipe"></div>
         <div class="rl-rail"><span><i data-ic="heart"></i>31.8K</span><span><i data-ic="comment"></i>418</span><span><i data-ic="repost"></i>459</span><span><i data-ic="send"></i>1.9K</span><span><i data-ic="bookmark"></i>20.8K</span><span><i data-ic="lines"></i></span></div>
       </div>
         <div class="rl-meta">
@@ -1037,6 +1051,7 @@ addEventListener(&#x27;wheel&#x27;,function(e){parent.postMessage({type:&#x27;fl
         </div>
       </div></div>
       <div><div class="rl-box"><div class="rl-frame">
+        <div class="rl-swipe"></div>
         <div class="rl-rail"><span><i data-ic="heart"></i>24.6K</span><span><i data-ic="comment"></i>302</span><span><i data-ic="repost"></i>286</span><span><i data-ic="send"></i>1.1K</span><span><i data-ic="bookmark"></i>9,412</span><span><i data-ic="lines"></i></span></div>
       </div>
         <div class="rl-meta">
@@ -1045,6 +1060,7 @@ addEventListener(&#x27;wheel&#x27;,function(e){parent.postMessage({type:&#x27;fl
         </div>
       </div></div>
       <div><div class="rl-box"><div class="rl-frame">
+        <div class="rl-swipe side"></div>
         <div class="rl-rail"><span><i data-ic="heart"></i>48.2K</span><span><i data-ic="comment"></i>612</span><span><i data-ic="repost"></i>731</span><span><i data-ic="send"></i>2.1K</span><span><i data-ic="bookmark"></i>16.3K</span><span><i data-ic="lines"></i></span></div>
       </div>
         <div class="rl-meta">
@@ -1767,9 +1783,19 @@ setInterval(() => {
 // but once the Flick has nothing of its own to scroll, the browser hands the scroll on to the page. The page keeps
 // some scroll room above and below the screen and turns that scroll into a format change; the phone follows the finger.
 const ROOM = 700;
+// Touch screens get no scroll room: a page that scrolls makes the phone browser slide its address bar in and out.
+// There the page stays fixed, and swipes between reels are caught by the swipe areas laid over each Flick.
+const USE_ROOM = !(window.matchMedia && matchMedia('(pointer: coarse)').matches);
 const room = document.createElement('div'); room.className = 'scroll-room'; room.setAttribute('aria-hidden', 'true');
-document.body.appendChild(room); document.documentElement.classList.add('room');
-function roomHome() { if (Math.abs(scrollY - ROOM) > .5) scrollTo({ top: ROOM, left: 0, behavior: 'instant' }); }
+if (USE_ROOM) { document.body.appendChild(room); document.documentElement.classList.add('room'); }
+function roomHome() { if (!USE_ROOM) return; if (Math.abs(scrollY - ROOM) > .5) scrollTo({ top: ROOM, left: 0, behavior: 'instant' }); }
+// Phones: go full screen on the first tap where the browser allows it (Android). iPhone browsers do not allow a page
+// to do this; there the bars simply stay put, and "Add to Home Screen" opens the prototype with no bars at all.
+if (!USE_ROOM && FM_SOLO) {
+  const goFull = () => { const d = document.documentElement, f = d.requestFullscreen || d.webkitRequestFullscreen;
+    if (f && !(document.fullscreenElement || document.webkitFullscreenElement)) { try { const r = f.call(d, { navigationUI: 'hide' }); if (r && r.catch) r.catch(() => {}); } catch (e) {} } };
+  ['touchend', 'click'].forEach(n => addEventListener(n, goFull, { passive: true }));
+}
 function roomDrag(d, settle) {
   const ph = current && current.el.querySelector('.phone'); if (!ph) return;
   document.querySelectorAll('.fmt .phone').forEach(x => { if (x !== ph && x.style.translate) { x.style.transition = ''; x.style.translate = ''; } });
