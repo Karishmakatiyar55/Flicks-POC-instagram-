@@ -762,11 +762,15 @@ html.room::-webkit-scrollbar,html.room body::-webkit-scrollbar{display:none}
 #f1[data-state="ad"] .media .mi{pointer-events:auto}
 /* Instagram launch: splash, then the home feed; tapping the Gucci story opens it */
 .ig-launch{position:absolute;inset:0;z-index:40;transition:opacity .35s ease, transform .45s cubic-bezier(.2,.8,.2,1);transform-origin:var(--ox,30%) var(--oy,18%)}
-.fmt:not([data-state="splash"]):not([data-state="home"]) .ig-launch{opacity:0;transform:scale(1.06);pointer-events:none}
+.fmt:not([data-state="splash"]):not([data-state="home"]) .ig-launch{opacity:0;transform:scale(1.06);pointer-events:none;visibility:hidden;transition:opacity .35s ease, transform .45s cubic-bezier(.2,.8,.2,1), visibility 0s .45s}
+/* once the story is open the launch screens are gone for good: not painted, and nothing in them (the home feed's bottom
+   bar included) can take a tap meant for the story's Flick */
+.fmt:not([data-state="splash"]):not([data-state="home"]) .ig-launch *{pointer-events:none!important}
 .ig-splash{position:absolute;inset:0;z-index:2;background:#fff;display:flex;align-items:center;justify-content:center;transition:opacity .25s ease}
 .igs-logo{width:84px;height:84px;object-fit:contain}
 .igs-from{position:absolute;left:50%;bottom:calc(46px + env(safe-area-inset-bottom,0px));width:96px;transform:translateX(-50%)}
-.fmt:not([data-state="splash"]) .ig-splash{opacity:0;pointer-events:none}
+.fmt:not([data-state="splash"]) .ig-splash{opacity:0;pointer-events:none;visibility:hidden;transition:opacity .25s ease, visibility 0s .25s}
+.fmt[data-state="splash"] .ig-tabs{opacity:0;visibility:hidden}   /* no bottom bar on the launch logo */
 .fmt[data-state="splash"] .sb{color:#111}
 .ig-home{position:absolute;inset:0;background:#000;color:#f5f5f5;display:flex;flex-direction:column;padding-top:var(--sbh)}
 .igh-body{flex:1;min-height:0;overflow:visible}
